@@ -21,3 +21,32 @@
 .assignment-search-note{margin:0!important;font-size:13px}.modal fieldset{max-height:42vh;overflow:auto}
 
 .app-version{margin:0 0 18px;font-size:11px;color:#9ee1c7;font-weight:700;letter-spacing:.04em}
+
+/* Calendar: keep the complete week visible at every desktop window width. */
+.calendar{
+  grid-template-columns:minmax(0,1.35fr) repeat(7,minmax(0,1fr));
+  width:100%;
+  overflow:hidden;
+}
+.calendar > *{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.calendar-corner,.day-header{
+  padding:7px;
+  font-size:11px;
+}
+.staff-cell{
+  padding:7px;
+  font-size:13px;
+}
+.staff-cell small{font-size:11px}
+.assignment{
+  min-width:0;
+  padding:6px;
+  font-size:11px;
+  overflow-wrap:anywhere;
+}
+.assignment strong{font-size:11px}
+.assignment em{font-size:12px}
+.status{font-size:9px}
