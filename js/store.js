@@ -1,6 +1,6 @@
 const DB_NAME = 'cleanflow-db';
-const DB_VERSION = 2;
-const STORES = ['staff', 'apartments', 'categories', 'assignments', 'payments', 'settings'];
+const DB_VERSION = 3;
+const STORES = ['staff', 'apartments', 'categories', 'assignments', 'payments', 'reservations', 'checkoutStates', 'settings'];
 const request = result => new Promise((resolve, reject) => { result.onsuccess = () => resolve(result.result); result.onerror = () => reject(result.error); });
 const complete = transaction => new Promise((resolve, reject) => { transaction.oncomplete = resolve; transaction.onerror = () => reject(transaction.error); transaction.onabort = () => reject(transaction.error || new Error('Database transaction was aborted.')); });
 const normalized = data => Object.fromEntries(STORES.map(name => [name, Array.isArray(data?.[name]) ? data[name] : []]));
@@ -19,4 +19,3 @@ export class Store {
   async data() { const values = await Promise.all(STORES.map(name => this.all(name))); return Object.fromEntries(STORES.map((name, index) => [name, values[index]])); }
   async replace(data) { const clean = normalized(data); const tx = this.db.transaction(STORES, 'readwrite'); STORES.forEach(name => { const store = tx.objectStore(name); store.clear(); clean[name].forEach(value => store.put(value)); }); await complete(tx); }
 }
-

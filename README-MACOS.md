@@ -1,4 +1,4 @@
-# CleanFlow Production 1.1.5
+# CleanFlow Production 1.2.0
 
 Production source only: no demo data, no sample records, and no Windows-only launchers.
 

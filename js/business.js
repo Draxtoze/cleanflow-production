@@ -1,4 +1,6 @@
-export const BACKUP_VERSION = 2;
+import { validateReservationRecord } from './reservations.js';
+
+export const BACKUP_VERSION = 3;
 export const toGrosz = value => {
   const normalized = String(value ?? '').trim().replace(/\s/g, '').replace(',', '.');
   if (!/^\d+(\.\d{1,2})?$/.test(normalized)) throw new Error('Enter a valid PLN amount with no more than two decimal places.');
@@ -19,13 +21,16 @@ export function staffSummary(staffId, assignments, payments) {
   return { expectedGrosz, confirmedGrosz, paidGrosz, dueGrosz: confirmedGrosz - paidGrosz };
 }
 export function validateBackup(data) {
-  if (!data || ![1, BACKUP_VERSION].includes(data.version) || !data.data || typeof data.data !== 'object') throw new Error('This is not a supported CleanFlow backup.');
+  if (!data || ![1, 2, BACKUP_VERSION].includes(data.version) || !data.data || typeof data.data !== 'object') throw new Error('This is not a supported CleanFlow backup.');
   for (const key of ['staff', 'apartments', 'assignments', 'payments', 'settings']) if (!Array.isArray(data.data[key])) throw new Error(`Backup is missing a valid ${key} collection.`);
-  if (data.data.categories !== undefined && !Array.isArray(data.data.categories)) throw new Error('Backup is missing a valid categories collection.');
+  for (const key of ['categories', 'reservations', 'checkoutStates']) if (data.data[key] !== undefined && !Array.isArray(data.data[key])) throw new Error(`Backup is missing a valid ${key} collection.`);
   for (const assignment of data.data.assignments) {
     if (!assignment.id || !assignment.staffId || !/^\d{4}-\d{2}-\d{2}$/.test(assignment.date) || !['planned', 'confirmed'].includes(assignment.status) || !Array.isArray(assignment.apartments)) throw new Error('The backup contains an invalid assignment.');
-    if (assignment.apartments.some(a => !Number.isInteger(a.priceGrosz) || a.priceGrosz < 0)) throw new Error('The backup contains an invalid money snapshot.');
+    if (assignment.apartments.some(apartment => !Number.isInteger(apartment.priceGrosz) || apartment.priceGrosz < 0)) throw new Error('The backup contains an invalid money snapshot.');
   }
-  if (data.data.payments.some(p => !p.id || !p.staffId || !Number.isInteger(p.amountGrosz) || p.amountGrosz <= 0)) throw new Error('The backup contains an invalid payment.');
+  if (data.data.payments.some(payment => !payment.id || !payment.staffId || !Number.isInteger(payment.amountGrosz) || payment.amountGrosz <= 0)) throw new Error('The backup contains an invalid payment.');
+  const reservations = data.data.reservations || [];
+  reservations.forEach(reservation => validateReservationRecord(reservation, reservations, reservation.id));
+  for (const state of data.data.checkoutStates || []) if (!state.id || !state.apartmentId || !/^\d{4}-\d{2}-\d{2}$/.test(state.date) || !['ignored'].includes(state.status)) throw new Error('The backup contains an invalid checkout state.');
   return true;
 }
