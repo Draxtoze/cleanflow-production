@@ -1,0 +1,16 @@
+{
+  "name": "CleanFlow Planning",
+  "short_name": "CleanFlow",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f8f7",
+  "theme_color": "#173f44",
+  "icons": [
+    {
+      "src": "assets/cleanflow-icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
