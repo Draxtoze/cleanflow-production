@@ -5,8 +5,6 @@
 .calendar{box-shadow:0 2px 8px #193e4215}.calendar-corner,.day-header{color:#29494b;background:#edf4f2}.staff-cell small{color:#36565a}.assignment{background:#ffe0cf;color:#702000;border:1px solid #db7953;box-shadow:inset 3px 0 #bf3a14}.assignment.confirmed{background:#d9f2e5;color:#075d3c;border-color:#4aa879;box-shadow:inset 3px 0 #075d3c}.assignment.blank{color:#365b5d;background:#eef5f3;border-color:#789d97;box-shadow:none}.pending{color:#962600!important;font-weight:850;background:#fff0e9;padding:3px 6px;border-radius:4px;border-left:4px solid #c63c10}.due{color:#075d3c!important;font-weight:850;background:#e5f5ec;padding:3px 6px;border-radius:4px;border-left:4px solid #098653}.warning{background:#ffebc9;color:#683900;border:1px solid #d49620;font-weight:650}.danger-card{border:2px solid #c85151;background:#fff7f7}.danger-card h2{color:#861b1b}.empty{border:2px dashed #789d97;background:#fbfefd}.empty h3{font-size:20px}.empty button{margin-top:8px}.card,.balance-card{border-color:#b3c8c4}.pill{background:#d9e9e5;color:#234c4c;font-weight:700}button.secondary{border-color:#789d97}
 .review-note{background:#e4f3f0;color:#173f44;border-left:4px solid #08756b;padding:10px;border-radius:6px;font-weight:550}.review-note strong{color:#075d3c}
 
-.demo-banner{display:flex;align-items:center;gap:10px;background:#e2f4ee;color:#075d3c;border:1px solid #49a77e;border-left:5px solid #087a51;border-radius:8px;padding:10px 13px;margin-bottom:20px}.demo-banner span{font-size:13px;font-weight:600}
-
 @media (min-width:851px){aside{position:sticky;top:0;height:100vh;overflow-y:auto;align-self:start}}
 .search-field{display:grid;gap:5px;max-width:520px;margin:-8px 0 18px;font-size:12px;font-weight:750;color:#385356}.search-field input{width:100%;padding:11px 12px;border:2px solid #789d97;border-radius:8px;font:inherit;color:#173f44;background:#fff}.search-empty{grid-column:1/-1}.staff-details{grid-template-columns:1fr;margin:16px 0}.staff-details dd{font-size:15px;overflow-wrap:anywhere}.staff-note{background:#eef6f4;border-left:3px solid #5e9790;padding:8px 10px;border-radius:4px;font-size:13px}.apartment-card{min-height:205px}.apartment-reference{min-height:22px;font-size:13px;font-style:italic}
 .tutorial{display:grid;gap:14px;padding-left:22px}.tutorial li{padding-left:4px}
@@ -22,31 +20,26 @@
 
 .app-version{margin:0 0 18px;font-size:11px;color:#9ee1c7;font-weight:700;letter-spacing:.04em}
 
-/* Calendar: keep the complete week visible at every desktop window width. */
-.calendar{
-  grid-template-columns:minmax(0,1.35fr) repeat(7,minmax(0,1fr));
-  width:100%;
-  overflow:hidden;
-}
-.calendar > *{
-  min-width:0;
-  overflow-wrap:anywhere;
-}
-.calendar-corner,.day-header{
-  padding:7px;
-  font-size:11px;
-}
-.staff-cell{
-  padding:7px;
-  font-size:13px;
-}
-.staff-cell small{font-size:11px}
-.assignment{
-  min-width:0;
-  padding:6px;
-  font-size:11px;
-  overflow-wrap:anywhere;
-}
-.assignment strong{font-size:11px}
-.assignment em{font-size:12px}
-.status{font-size:9px}
+/* Version 1.1.0: calendar scaling, staff ordering, and apartment categories. */
+.calendar{grid-template-columns:minmax(0,1.35fr) repeat(7,minmax(0,1fr));width:100%;overflow:hidden}
+.calendar>*{min-width:0;overflow-wrap:anywhere}
+.calendar-corner,.day-header{padding:7px;font-size:11px}
+.staff-cell{padding:7px;font-size:13px}.staff-cell small{font-size:11px}
+.assignment{min-width:0;padding:6px;font-size:11px;overflow-wrap:anywhere}.assignment strong{font-size:11px}.assignment em{font-size:12px}.status{font-size:9px}
+.staff-order-help{margin:-8px 0 18px;padding:10px 12px;border-left:4px solid #08756b;background:#eaf5f2;border-radius:6px;color:#254a4d}
+.staff-card-heading{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.reorder-controls{display:flex;gap:5px}.reorder-controls button{min-width:38px;padding:7px 9px;font-size:17px;line-height:1}.reorder-controls button:disabled{opacity:.38;cursor:not-allowed;filter:none}
+.category-overview{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-8px 0 18px;padding:10px 12px;border:1px solid #b3c8c4;border-radius:9px;background:#fff}.category-overview strong{margin-right:4px}.apartment-groups{display:grid;gap:24px}.apartment-group{display:grid;gap:10px}.apartment-group>h2{display:flex;align-items:center;gap:8px;margin:0;font-size:17px}.apartment-group>h2 span{font-size:11px;background:#d9e9e5;color:#234c4c;border-radius:999px;padding:2px 7px}.apartment-category{display:inline-flex!important;width:max-content;max-width:100%;margin:10px 0 0!important;padding:3px 8px;border-radius:999px;background:#e5f3f0;color:#075d3c;font-size:12px;font-weight:750}.category-manager-list{display:grid;gap:6px}.category-manager-list>div{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+@media(max-width:850px){.calendar{grid-template-columns:minmax(96px,1.35fr) repeat(7,minmax(0,1fr))}.calendar>*{min-height:68px;padding:5px}.staff-cell{font-size:11px}.staff-cell small,.assignment strong,.assignment em{font-size:10px}.assignment{padding:4px;font-size:10px}.status{font-size:8px}.reorder-controls button{min-width:35px}.category-overview{align-items:flex-start}}
+
+/* Version 1.1.2: easy-to-spot current day and drag feedback. */
+.day-header.today{background:#fff1a8!important;color:#694800!important;box-shadow:inset 0 -3px #d8a900}.assignment.current-day{outline:2px solid #e0b300;outline-offset:-2px}.assignment.blank.current-day{background:#fffbea;border-color:#d6b64c}.drag-handle{display:grid;place-items:center;min-width:38px;height:38px;border:1px dashed #789d97;border-radius:8px;background:#f4f8f7;color:#285860;font-size:22px;line-height:1;cursor:grab;user-select:none}.drag-handle:active{cursor:grabbing}.staff-card.dragging{opacity:.42}.staff-card.drop-target{outline:3px solid #e0b300;outline-offset:3px;transform:translateY(-2px)}
+
+/* Version 1.1.3: precise insertion marker while reordering staff. */
+.staff-card{position:relative}.staff-card.drop-before::before,.staff-card.drop-after::after{content:'';position:absolute;left:-8px;right:-8px;height:5px;background:#f2c600;border:2px solid #8a6900;border-radius:99px;z-index:3;box-shadow:0 1px 5px #6d520066}.staff-card.drop-before::before{top:-10px}.staff-card.drop-after::after{bottom:-10px}
+
+/* Version 1.1.4: live card movement while reordering staff. */
+.drag-handle{touch-action:none}.staff-card-placeholder{min-height:120px;border:2px dashed #c89c00;border-radius:12px;background:#fff7cf;box-shadow:inset 0 0 0 3px #fffbea}.staff-card.drag-ghost{position:fixed!important;z-index:100;pointer-events:none;margin:0;opacity:.96;transform:rotate(1deg) scale(1.02);box-shadow:0 18px 40px #173f4466;cursor:grabbing}.staff-card.drag-source{display:none}
+
+/* Version 1.1.5: smooth staff-card reflow during drag. */
+.staff-card-placeholder{opacity:.34;filter:saturate(.55);pointer-events:none}.staff-card-placeholder::after{content:'Moving here';display:block;margin-top:10px;color:#705500;font-weight:800;font-size:12px}.staff-card.drag-ghost{opacity:.78!important;transition:box-shadow .18s ease}
+

@@ -1,4 +1,4 @@
-export const BACKUP_VERSION = 1;
+export const BACKUP_VERSION = 2;
 export const toGrosz = value => {
   const normalized = String(value ?? '').trim().replace(/\s/g, '').replace(',', '.');
   if (!/^\d+(\.\d{1,2})?$/.test(normalized)) throw new Error('Enter a valid PLN amount with no more than two decimal places.');
@@ -19,8 +19,9 @@ export function staffSummary(staffId, assignments, payments) {
   return { expectedGrosz, confirmedGrosz, paidGrosz, dueGrosz: confirmedGrosz - paidGrosz };
 }
 export function validateBackup(data) {
-  if (!data || data.version !== BACKUP_VERSION || !data.data || typeof data.data !== 'object') throw new Error('This is not a supported CleanFlow backup.');
+  if (!data || ![1, BACKUP_VERSION].includes(data.version) || !data.data || typeof data.data !== 'object') throw new Error('This is not a supported CleanFlow backup.');
   for (const key of ['staff', 'apartments', 'assignments', 'payments', 'settings']) if (!Array.isArray(data.data[key])) throw new Error(`Backup is missing a valid ${key} collection.`);
+  if (data.data.categories !== undefined && !Array.isArray(data.data.categories)) throw new Error('Backup is missing a valid categories collection.');
   for (const assignment of data.data.assignments) {
     if (!assignment.id || !assignment.staffId || !/^\d{4}-\d{2}-\d{2}$/.test(assignment.date) || !['planned', 'confirmed'].includes(assignment.status) || !Array.isArray(assignment.apartments)) throw new Error('The backup contains an invalid assignment.');
     if (assignment.apartments.some(a => !Number.isInteger(a.priceGrosz) || a.priceGrosz < 0)) throw new Error('The backup contains an invalid money snapshot.');
