@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assignmentTotal, snapshotApartment, staffSummary, toGrosz, validateBackup, BACKUP_VERSION } from '../js/business.js';
+import { assignmentTotal, monthlyCategoryReport, reportStatus, snapshotApartment, staffSummary, toGrosz, validateBackup, weeklyStaffReport, BACKUP_VERSION } from '../js/business.js';
 import { checkoutsOn, checkoutCleaningStatus, formatDmy, parseDmy, validateReservationRecord } from '../js/reservations.js';
 import { bookingNightLabel, formatBookingWeekday, priorityLabel, t } from '../js/i18n.js';
 
@@ -57,4 +57,27 @@ test('booking translations use English fallback and Polish plural forms', () => 
   assert.equal(priorityLabel('pl', 5), 'priorytetów');
   assert.equal(formatBookingWeekday('pl', '2026-09-14'), 'Pon');
   assert.equal(formatBookingWeekday('en', '2026-09-14'), 'Mon');
+});
+test('weekly staff report preserves planned and confirmed financial separation', () => {
+  const data = { staff: [{ id: 's1', name: 'Anna', active: true }], apartments: [{ id: 'p1', name: 'One', categoryId: 'c1' }, { id: 'p2', name: 'Two', categoryId: 'c1' }], categories: [{ id: 'c1', name: 'Central' }], assignments: [planned, confirmed], payments: [{ id: 'pay', staffId: 's1', date: '2026-09-02', amountGrosz: 3000 }], reservations: [], checkoutStates: [] };
+  const report = weeklyStaffReport(data, '2026-08-31');
+  assert.equal(report.sections.length, 1);
+  assert.equal(report.totals.expectedGrosz, 12550);
+  assert.equal(report.totals.confirmedGrosz, 9900);
+  assert.equal(report.totals.paidGrosz, 3000);
+  assert.equal(report.sections[0].dueAtEndGrosz, 6900);
+  assert.equal(data.assignments[0].status, 'planned');
+});
+test('monthly category report keeps checkout-exclusive stays and detects turnover', () => {
+  const data = { staff: [], assignments: [], payments: [], checkoutStates: [], categories: [{ id: 'c1', name: 'Central' }], apartments: [{ id: 'p1', name: 'One', categoryId: 'c1' }], reservations: [{ id: 'r1', apartmentId: 'p1', checkIn: '2026-08-30', checkOut: '2026-09-03', notes: '' }, { id: 'r2', apartmentId: 'p1', checkIn: '2026-09-03', checkOut: '2026-09-07', notes: '' }] };
+  const report = monthlyCategoryReport(data, '2026-09-01', 'c1');
+  assert.equal(report.reservations.length, 2);
+  assert.equal(report.totalNights, 6);
+  assert.equal(report.departures.length, 2);
+  assert.deepEqual(report.turnovers, [{ apartmentId: 'p1', date: '2026-09-03' }]);
+});
+test('report status distinguishes final, temporary and forecast periods', () => {
+  assert.equal(reportStatus('2026-09-01', '2026-09-08', '2026-09-10'), 'final');
+  assert.equal(reportStatus('2026-09-08', '2026-09-15', '2026-09-10'), 'temporary');
+  assert.equal(reportStatus('2026-09-15', '2026-09-22', '2026-09-10'), 'forecast');
 });

@@ -34,3 +34,34 @@ export function validateBackup(data) {
   for (const state of data.data.checkoutStates || []) if (!state.id || !state.apartmentId || !/^\d{4}-\d{2}-\d{2}$/.test(state.date) || !['ignored'].includes(state.status)) throw new Error('The backup contains an invalid checkout state.');
   return true;
 }
+
+export const isoMonthStart = iso => `${String(iso).slice(0, 7)}-01`;
+export const monthEnd = monthStart => { const month = new Date(`${monthStart}T12:00:00Z`); month.setUTCMonth(month.getUTCMonth() + 1); return month.toISOString().slice(0, 10); };
+export const reportStatus = (start, endExclusive, today = localDate(new Date())) => endExclusive <= today ? 'final' : start > today ? 'forecast' : 'temporary';
+const within = (date, start, endExclusive) => date >= start && date < endExclusive;
+const assignmentRows = (assignment, apartmentsById, categoriesById) => (assignment.apartments || []).map(apartment => {
+  const live = apartmentsById.get(apartment.apartmentId);
+  const category = categoriesById.get(live?.categoryId || '');
+  return { date: assignment.date, apartmentId: apartment.apartmentId, apartmentName: apartment.name, categoryName: category?.name || '', status: assignment.status, expectedGrosz: assignment.status === 'planned' ? apartment.priceGrosz : 0, confirmedGrosz: assignment.status === 'confirmed' ? apartment.priceGrosz : 0 };
+});
+export function weeklyStaffReport(data, weekStart) {
+  const weekEnd = addDays(weekStart, 7); const apartmentsById = new Map((data.apartments || []).map(item => [item.id, item])); const categoriesById = new Map((data.categories || []).map(item => [item.id, item]));
+  const staff = (data.staff || []).filter(person => person.active !== false).sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0) || a.name.localeCompare(b.name));
+  const sections = staff.map(person => {
+    const jobs = (data.assignments || []).filter(item => item.staffId === person.id && within(item.date, weekStart, weekEnd));
+    const rows = jobs.flatMap(job => assignmentRows(job, apartmentsById, categoriesById)).sort((a, b) => a.date.localeCompare(b.date) || a.apartmentName.localeCompare(b.apartmentName));
+    const payments = (data.payments || []).filter(item => item.staffId === person.id && within(item.date, weekStart, weekEnd)).sort((a, b) => a.date.localeCompare(b.date));
+    const confirmedToEnd = (data.assignments || []).filter(item => item.staffId === person.id && item.status === 'confirmed' && item.date < weekEnd).reduce((sum, item) => sum + assignmentTotal(item), 0);
+    const paidToEnd = (data.payments || []).filter(item => item.staffId === person.id && item.date < weekEnd).reduce((sum, item) => sum + item.amountGrosz, 0);
+    return { staff: person, rows, payments, plannedCount: rows.filter(row => row.status === 'planned').length, confirmedCount: rows.filter(row => row.status === 'confirmed').length, expectedGrosz: rows.reduce((sum, row) => sum + row.expectedGrosz, 0), confirmedGrosz: rows.reduce((sum, row) => sum + row.confirmedGrosz, 0), paidGrosz: payments.reduce((sum, payment) => sum + payment.amountGrosz, 0), dueAtEndGrosz: confirmedToEnd - paidToEnd };
+  });
+  return { weekStart, weekEnd, sections, totals: { plannedCount: sections.reduce((sum, item) => sum + item.plannedCount, 0), confirmedCount: sections.reduce((sum, item) => sum + item.confirmedCount, 0), expectedGrosz: sections.reduce((sum, item) => sum + item.expectedGrosz, 0), confirmedGrosz: sections.reduce((sum, item) => sum + item.confirmedGrosz, 0), paidGrosz: sections.reduce((sum, item) => sum + item.paidGrosz, 0), dueAtEndGrosz: sections.reduce((sum, item) => sum + item.dueAtEndGrosz, 0) } };
+}
+export function monthlyCategoryReport(data, monthStart, categoryId = '') {
+  const end = monthEnd(monthStart); const category = (data.categories || []).find(item => item.id === categoryId); const apartments = (data.apartments || []).filter(item => (item.categoryId || '') === categoryId).sort((a, b) => a.name.localeCompare(b.name));
+  const apartmentsById = new Map(apartments.map(item => [item.id, item])); const reservations = (data.reservations || []).filter(item => apartmentsById.has(item.apartmentId) && item.checkIn < end && item.checkOut > monthStart).sort((a, b) => a.checkIn.localeCompare(b.checkIn));
+  const arrivals = reservations.filter(item => within(item.checkIn, monthStart, end)); const departures = reservations.filter(item => within(item.checkOut, monthStart, end));
+  const turnovers = departures.filter(out => (data.reservations || []).some(inside => inside.apartmentId === out.apartmentId && inside.checkIn === out.checkOut)).map(out => ({ apartmentId: out.apartmentId, date: out.checkOut }));
+  const stayNights = reservation => Math.max(0, Math.round((Date.parse(`${(reservation.checkOut < end ? reservation.checkOut : end)}T00:00:00Z`) - Date.parse(`${(reservation.checkIn > monthStart ? reservation.checkIn : monthStart)}T00:00:00Z`)) / 86400000));
+  return { monthStart, monthEnd: end, category: { id: categoryId, name: category?.name || '' }, apartments, reservations, arrivals, departures, turnovers, totalNights: reservations.reduce((sum, item) => sum + stayNights(item), 0), staysByApartment: apartments.map(apartment => ({ apartment, reservations: reservations.filter(item => item.apartmentId === apartment.id) })) };
+}

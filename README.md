@@ -1,4 +1,4 @@
-# CleanFlow production — 1.3.0
+# CleanFlow production — 1.4.0
 
 CleanFlow is a local-first desktop/PWA source package for planning apartment cleaning, staff assignments, balances and reservations. Production contains no demo data.
 
