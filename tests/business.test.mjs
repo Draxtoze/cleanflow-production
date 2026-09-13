@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assignmentTotal, snapshotApartment, staffSummary, toGrosz, validateBackup, BACKUP_VERSION } from '../js/business.js';
 import { checkoutsOn, checkoutCleaningStatus, formatDmy, parseDmy, validateReservationRecord } from '../js/reservations.js';
-import { bookingNightLabel, priorityLabel, t } from '../js/i18n.js';
+import { bookingNightLabel, formatBookingWeekday, priorityLabel, t } from '../js/i18n.js';
 
 const planned = { id: 'a1', staffId: 's1', date: '2026-09-01', status: 'planned', apartments: [{ apartmentId: 'p1', name: 'One', priceGrosz: 12550 }] };
 const confirmed = { id: 'a2', staffId: 's1', date: '2026-09-02', status: 'confirmed', apartments: [{ apartmentId: 'p2', name: 'Two', priceGrosz: 9900 }] };
@@ -55,4 +55,6 @@ test('booking translations use English fallback and Polish plural forms', () => 
   assert.equal(bookingNightLabel('pl', 3), 'noce');
   assert.equal(bookingNightLabel('pl', 5), 'nocy');
   assert.equal(priorityLabel('pl', 5), 'priorytetów');
+  assert.equal(formatBookingWeekday('pl', '2026-09-14'), 'Pon');
+  assert.equal(formatBookingWeekday('en', '2026-09-14'), 'Mon');
 });

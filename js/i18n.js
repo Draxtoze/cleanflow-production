@@ -13,4 +13,6 @@ export const priorityLabel = (language, count) => language === 'pl' ? polishPlur
 export const bonusLabel = (language, count) => language === 'pl' ? polishPlural(count, t(language, 'cleaning.bonus'), t(language, 'cleaning.bonuses'), t(language, 'cleaning.bonusesMany')) : t(language, count === 1 ? 'cleaning.bonus' : 'cleaning.bonuses');
 export const formatBookingDate = (language, iso) => new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(`${iso}T12:00:00`));
 export const formatBookingMonth = (language, iso) => new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-GB', { month: 'long', year: 'numeric' }).format(new Date(`${iso}T12:00:00`));
-export const formatBookingDay = (language, iso) => new Intl.DateTimeFormat(language === 'pl' ? 'pl-PL' : 'en-GB', { weekday: 'short', day: 'numeric' }).format(new Date(`${iso}T12:00:00`));
+const bookingWeekdays = { en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], pl: ['Nie', 'Pon', 'Wto', 'Śro', 'Czw', 'Pią', 'Sob'] };
+export const formatBookingWeekday = (language, iso) => (bookingWeekdays[language] ?? bookingWeekdays.en)[new Date(`${iso}T12:00:00`).getDay()];
+export const formatBookingDay = (language, iso) => formatBookingWeekday(language, iso);
