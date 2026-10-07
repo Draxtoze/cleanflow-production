@@ -1,6 +1,6 @@
-# CleanFlow production — 1.4.0
+# CleanFlow Production — 1.5.0
 
-CleanFlow is a local-first desktop/PWA source package for planning apartment cleaning, staff assignments, balances and reservations. Production contains no demo data.
+CleanFlow is a local-first desktop/PWA application for apartment cleaning, staff assignments, balances, bookings and owners. Download the Windows installer from GitHub Releases. Production starts blank; demo fixtures and user databases are not published. Export a backup before updating. See RELEASE-NOTES-1.5.0.md, IMPLEMENTATION-CHECKLIST.md and WINDOWS-INSTALLATION.md for installation, migration and validation details.
 
 ## Booking schedule
 

@@ -1,0 +1,47 @@
+/* One continuous element per stay; no day-cell seams over bookings. */
+.timeline-scroll{overflow:auto;max-height:72vh;border:1px solid #829e98;border-radius:12px;background:white}
+.timeline{--label-width:clamp(85px,15vw,170px);min-width:0;width:100%}
+.timeline-head,.timeline-row{display:grid;grid-template-columns:var(--label-width) minmax(0,1fr)}
+.timeline-head{position:sticky;top:0;z-index:5;background:#e6f0ed}
+.timeline-label{position:sticky;left:0;z-index:3;background:#edf5f2;padding:12px;font-size:13px;font-weight:750;border-right:1px solid #829e98;border-bottom:1px solid #b4c9c4;display:flex;align-items:center;overflow-wrap:anywhere}
+.timeline-head .timeline-label{z-index:6}
+.timeline-dates,.timeline-days{display:grid;grid-template-columns:repeat(var(--days),minmax(0,1fr))}
+.timeline-date{display:grid;text-align:center;gap:4px;min-width:0;overflow:hidden;padding:10px 0;border-right:1px solid #a7bfb9;border-bottom:1px solid #829e98;font-size:clamp(6px,.72vw,12px)}
+.timeline-track{position:relative;height:65px;border-bottom:1px solid #b4c9c4;background:#fff}
+.timeline-row:nth-child(odd) .timeline-track{background:#f1f7f5}
+.timeline-days{position:absolute;inset:0}
+.timeline-day{display:grid;grid-template-columns:1fr 1fr;border-right:1px solid #b4c9c4}
+.timeline-empty{border:0;border-radius:0;background:transparent;min-width:0;padding:0;box-shadow:none}
+.timeline-empty:hover{background:#d5ebe3;filter:none}
+.timeline-empty.selection-start{background:#ffe493;box-shadow:inset 0 0 0 3px #be8500}
+.timeline-date.today,.timeline-day.today{background:#fff2ba}
+.timeline-stay{position:absolute;top:12px;height:40px;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:2px;padding:0 3px;border:2px solid #08756b;border-radius:20px;background:#ccebdd;color:#12473b;font-size:clamp(6px,.7vw,11px);overflow:hidden;white-space:nowrap;min-width:0}
+.timeline-stay.cash{background:#ffe2b8;border-color:#a45b00;color:#713700}
+.timeline-stay:hover,.timeline-stay:focus-visible{filter:brightness(.94);box-shadow:0 0 0 3px #173f4433;transform:translateY(-1px)}
+.timeline-payment{overflow:hidden;text-overflow:ellipsis}
+.timeline-stay>span{min-width:0;overflow:hidden;text-overflow:clip}.timeline-label{font-size:clamp(9px,.9vw,13px);padding:8px}.timeline-dates,.timeline-days,.timeline-track{min-width:0}
+@media(max-width:600px){.timeline-date>span{writing-mode:vertical-rl;justify-self:center}.timeline-date{gap:2px;font-size:7px}.timeline-label{padding:5px}.timeline-payment{display:none}.timeline-stay{padding:0;gap:0;border-width:1px}.timeline-stay>span:first-child,.timeline-stay>span:last-child{padding:2px 1px!important}}
+.timeline-stay>span:first-child{background:#b0dfcc;border-radius:10px;padding:3px 5px}.timeline-stay>span:last-child{background:#ffd7b3;border-radius:10px;padding:3px 5px;color:#793d00}
+.timeline-label.selection-apartment{background:#ffe493;box-shadow:inset 4px 0 #be8500}
+.calendar .day-header.date-hover{background:#ffe6a1!important;color:#694800;box-shadow:inset 0 -3px #cf9b22}
+.calendar .assignment.date-hover{box-shadow:inset 0 0 0 2px #d5a93b;background:#fff0c7}
+.calendar .assignment.confirmed.date-hover{background:#dbefca}.calendar .assignment.priority-assignment.date-hover{box-shadow:inset 0 0 0 2px #bc8400!important}
+.timeline-date.date-hover{background:#ffe6a1;color:#694800;box-shadow:inset 0 -3px #cf9b22}.timeline-day.date-hover{background:#fff0c7}.timeline-day.date-hover.today{background:#ffe6a1}
+.owner-filters{display:flex;gap:10px;margin-bottom:18px}.owner-filters input{flex:1}.owner-card p{overflow-wrap:anywhere}
+.modal .booking-dog-toggle{display:flex;align-items:center;gap:8px}.modal .booking-dog-toggle input{width:16px;height:16px;margin:0;accent-color:#08756b}
+.owner-card{display:flex;flex-direction:column;min-width:0}.owner-card[hidden]{display:none}.owner-card .card-actions{margin-top:auto;padding-top:18px;flex-wrap:wrap}
+.modal.order-modal{display:flex;flex-direction:column;overflow:hidden}.order-modal>header,.order-modal>.order-top-actions{flex-shrink:0}.order-modal>.modal-body{min-height:0;overflow-y:auto;overscroll-behavior:contain}.order-modal>.order-top-actions{border-top:0;border-bottom:1px solid var(--line);padding:10px 20px;background:#f4f8f6}.order-card strong{min-width:0;overflow-wrap:anywhere}.order-card strong small{display:block;font-size:11px;font-weight:400;color:#527069;margin-top:3px}
+.modal [data-apartment-option]{display:grid;grid-template-columns:18px minmax(0,1fr)!important;gap:8px;min-width:0;padding:10px 6px;border-bottom:1px solid #e0ebe7;align-items:start}
+.modal [data-apartment-option]>input{width:16px;height:16px;margin:3px 0;accent-color:#08756b}
+.modal [data-apartment-option]>span{min-width:0;overflow-wrap:anywhere;font-weight:650}
+.modal [data-apartment-option]>span small{display:block;margin:3px 0 0;font-size:12px;font-weight:400}
+.modal .dog-fields{grid-column:2;display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:8px 12px;min-width:0;margin:2px 0 0;padding:10px 12px;background:#f3f7f5;border:1px solid #d9e6e1;border-radius:8px}
+.modal .dog-fields[hidden]{display:none}
+.modal .dog-fields .dog-toggle{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px;font-weight:600}
+.modal .dog-fields .dog-toggle input{flex:0 0 16px;width:16px;height:16px;min-width:0;margin:0;padding:0;accent-color:#08756b}
+.modal .dog-fields .dog-amount{min-width:0;gap:4px;font-size:11px;font-weight:500;color:#4c6864}
+.modal .dog-fields .dog-amount input{width:100%;min-width:0;max-width:100%;padding:7px 8px;font-size:13px;font-variant-numeric:tabular-nums;background:white}
+.modal .dog-fields .dog-amount input:disabled{background:#edf2ef;color:#83958e}
+.modal .dog-fields small{grid-column:1/-1;margin:0;font-size:11px;color:#527069;overflow-wrap:anywhere}
+@media(max-width:420px){.modal .dog-fields{grid-template-columns:minmax(0,1fr);padding:8px}.modal .dog-fields .dog-amount{max-width:150px}.modal .dog-fields small{grid-column:1}}
+.order-list{display:grid;gap:10px}.order-card{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #829e98;background:#eef6f3;border-radius:8px;touch-action:none}.order-card strong{flex:1}.order-card button{padding:6px}.order-ghost{position:fixed;z-index:100;opacity:.75;pointer-events:none;box-shadow:0 12px 30px #173f4466}.order-placeholder{border:2px dashed #a57e00;background:#fff4bd;min-height:64px;border-radius:8px}.order-dirty{color:#956500;font-weight:700}.customer-payment [hidden]{display:none}

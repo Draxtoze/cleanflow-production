@@ -1,18 +1,21 @@
 import { validateReservationRecord } from './reservations.js';
+import { cleaningAmount, validateOperations } from './operations.js';
 
-export const BACKUP_VERSION = 3;
+export const BACKUP_VERSION = 4;
 export const toGrosz = value => {
   const normalized = String(value ?? '').trim().replace(/\s/g, '').replace(',', '.');
   if (!/^\d+(\.\d{1,2})?$/.test(normalized)) throw new Error('Enter a valid PLN amount with no more than two decimal places.');
-  return Math.round(Number(normalized) * 100);
+  const amount=Math.round(Number(normalized) * 100);
+  if(!Number.isSafeInteger(amount))throw new Error('PLN amount is too large.');
+  return amount;
 };
 export const formatPLN = grosz => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format((Number(grosz) || 0) / 100);
 export const id = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 export const localDate = date => new Date(date).toLocaleDateString('en-CA');
 export const addDays = (date, number) => { const next = new Date(`${date}T12:00:00`); next.setDate(next.getDate() + number); return localDate(next); };
 export const weekDays = anchor => { const date = new Date(`${anchor}T12:00:00`); const offset = (date.getDay() + 6) % 7; return Array.from({ length: 7 }, (_, i) => addDays(localDate(date), i - offset)); };
-export const snapshotApartment = apartment => ({ apartmentId: apartment.id, name: apartment.name, priceGrosz: apartment.priceGrosz });
-export function assignmentTotal(assignment) { return assignment.apartments.reduce((sum, item) => sum + item.priceGrosz, 0); }
+export const snapshotApartment = apartment => ({ apartmentId: apartment.id, name: apartment.name, priceGrosz: apartment.priceGrosz, ownerCleaningChargeGrosz: apartment.ownerCleaningChargeGrosz || 0 });
+export function assignmentTotal(assignment) { return assignment.apartments.reduce((sum, item) => sum + cleaningAmount(item), 0); }
 export function staffSummary(staffId, assignments, payments) {
   const own = assignments.filter(item => item.staffId === staffId);
   const expectedGrosz = own.filter(item => item.status === 'planned').reduce((sum, item) => sum + assignmentTotal(item), 0);
@@ -21,9 +24,9 @@ export function staffSummary(staffId, assignments, payments) {
   return { expectedGrosz, confirmedGrosz, paidGrosz, dueGrosz: confirmedGrosz - paidGrosz };
 }
 export function validateBackup(data) {
-  if (!data || ![1, 2, BACKUP_VERSION].includes(data.version) || !data.data || typeof data.data !== 'object') throw new Error('This is not a supported CleanFlow backup.');
+  if (!data || ![1, 2, 3, BACKUP_VERSION].includes(data.version) || !data.data || typeof data.data !== 'object') throw new Error('This is not a supported CleanFlow backup.');
   for (const key of ['staff', 'apartments', 'assignments', 'payments', 'settings']) if (!Array.isArray(data.data[key])) throw new Error(`Backup is missing a valid ${key} collection.`);
-  for (const key of ['categories', 'reservations', 'checkoutStates']) if (data.data[key] !== undefined && !Array.isArray(data.data[key])) throw new Error(`Backup is missing a valid ${key} collection.`);
+  for (const key of ['categories', 'owners', 'reservations', 'checkoutStates']) if (data.data[key] !== undefined && !Array.isArray(data.data[key])) throw new Error(`Backup is missing a valid ${key} collection.`);
   for (const assignment of data.data.assignments) {
     if (!assignment.id || !assignment.staffId || !/^\d{4}-\d{2}-\d{2}$/.test(assignment.date) || !['planned', 'confirmed'].includes(assignment.status) || !Array.isArray(assignment.apartments)) throw new Error('The backup contains an invalid assignment.');
     if (assignment.apartments.some(apartment => !Number.isInteger(apartment.priceGrosz) || apartment.priceGrosz < 0)) throw new Error('The backup contains an invalid money snapshot.');
@@ -32,6 +35,7 @@ export function validateBackup(data) {
   const reservations = data.data.reservations || [];
   reservations.forEach(reservation => validateReservationRecord(reservation, reservations, reservation.id));
   for (const state of data.data.checkoutStates || []) if (!state.id || !state.apartmentId || !/^\d{4}-\d{2}-\d{2}$/.test(state.date) || !['ignored'].includes(state.status)) throw new Error('The backup contains an invalid checkout state.');
+  validateOperations(data.data);
   return true;
 }
 
@@ -42,7 +46,7 @@ const within = (date, start, endExclusive) => date >= start && date < endExclusi
 const assignmentRows = (assignment, apartmentsById, categoriesById) => (assignment.apartments || []).map(apartment => {
   const live = apartmentsById.get(apartment.apartmentId);
   const category = categoriesById.get(live?.categoryId || '');
-  return { date: assignment.date, apartmentId: apartment.apartmentId, apartmentName: apartment.name, categoryName: category?.name || '', status: assignment.status, expectedGrosz: assignment.status === 'planned' ? apartment.priceGrosz : 0, confirmedGrosz: assignment.status === 'confirmed' ? apartment.priceGrosz : 0 };
+  return { date: assignment.date, apartmentId: apartment.apartmentId, apartmentName: apartment.name, categoryName: category?.name || '', status: assignment.status, expectedGrosz: assignment.status === 'planned' ? cleaningAmount(apartment) : 0, confirmedGrosz: assignment.status === 'confirmed' ? cleaningAmount(apartment) : 0 };
 });
 export function weeklyStaffReport(data, weekStart) {
   const weekEnd = addDays(weekStart, 7); const apartmentsById = new Map((data.apartments || []).map(item => [item.id, item])); const categoriesById = new Map((data.categories || []).map(item => [item.id, item]));

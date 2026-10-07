@@ -1,13 +1,13 @@
 const DB_NAME = 'cleanflow-db';
-const DB_VERSION = 3;
-const STORES = ['staff', 'apartments', 'categories', 'assignments', 'payments', 'reservations', 'checkoutStates', 'settings'];
+const DB_VERSION = 4;
+const STORES = ['staff', 'apartments', 'categories', 'owners', 'assignments', 'payments', 'reservations', 'checkoutStates', 'settings'];
 const request = result => new Promise((resolve, reject) => { result.onsuccess = () => resolve(result.result); result.onerror = () => reject(result.error); });
 const complete = transaction => new Promise((resolve, reject) => { transaction.oncomplete = resolve; transaction.onerror = () => reject(transaction.error); transaction.onabort = () => reject(transaction.error || new Error('Database transaction was aborted.')); });
 const normalized = data => Object.fromEntries(STORES.map(name => [name, Array.isArray(data?.[name]) ? data[name] : []]));
 
 export class Store {
-  async open() {
-    const open = indexedDB.open(DB_NAME, DB_VERSION);
+  async open({ demo = false } = {}) {
+    const open = indexedDB.open(demo ? 'cleanflow-development-demo' : DB_NAME, DB_VERSION);
     open.onupgradeneeded = () => STORES.forEach(name => { if (!open.result.objectStoreNames.contains(name)) open.result.createObjectStore(name, { keyPath: 'id' }); });
     this.db = await request(open);
     return this;

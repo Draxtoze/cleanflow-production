@@ -9,4 +9,4 @@ http.createServer(async (request, response) => {
   if (!file.startsWith(root)) { response.writeHead(403); return response.end('Forbidden'); }
   try { response.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' }); response.end(await readFile(file)); }
   catch { response.writeHead(404); response.end('Not found'); }
-}).listen(5173, '127.0.0.1', () => console.log('CleanFlow: http://127.0.0.1:5173'));
+}).listen(Number(process.env.CLEANFLOW_PORT || 5173), '127.0.0.1', () => console.log(`CleanFlow: http://127.0.0.1:${process.env.CLEANFLOW_PORT || 5173}`));
