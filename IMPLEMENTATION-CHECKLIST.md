@@ -12,7 +12,11 @@
 - [x] EN/PL audit of pages and principal forms; remaining legacy strings identified below.
 - [x] Demo review and explicit publication approval by user on 7 October 2026.
 - [x] Windows installer built, demo module excluded.
-- [ ] Final checksum, source commit/tag and GitHub asset upload verified.
+- [x] Final checksum, source commit/tag and GitHub asset upload verified.
+
+Published release: https://github.com/Draxtoze/cleanflow-production/releases/tag/v1.5.0
+Source tag: `8e07bebb25042021362113fdb5a103842c9834f9`.
+GitHub installer SHA-256 matches the locally tested executable and SHA256SUMS.txt.
 
 ## Tests actually executed
 
