@@ -1,4 +1,19 @@
-# CleanFlow 1.5.0 — release validation
+# CleanFlow — release validation
+
+## 1.5.1 — Windows automatic updates
+
+- [x] Public GitHub provider, no bundled access token.
+- [x] One startup check, packaged Windows only; stable versions, no downgrade.
+- [x] Background download; explicit English/Polish install/restart approval.
+- [x] Later/dismissal/normal exit never installs; offline startup continues.
+- [x] 33 unit/regression tests pass; no production dependency audit vulnerabilities.
+- [x] Existing app ID, local origin, database schema and data retention unchanged.
+- [x] Packaged Windows smoke tests and updater initialization verified.
+- [ ] Installer, blockmap, latest.yml and checksums published and verified.
+
+Real installation of a future version through the updater is not yet certified.
+
+## 1.5.0
 
 - [x] Latest production cloned; Git history preserved.
 - [x] Booking payments, validation and English/Polish UI.

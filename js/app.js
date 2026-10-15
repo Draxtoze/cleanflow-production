@@ -5,7 +5,7 @@ import { checkoutsOn, formatDmy, monthDays, nightsBetween, parseDmy, reservation
 import { bonusLabel, bookingNightLabel, departureLabel, formatBookingDate, formatBookingDay, formatBookingMonth, formatBookingWeekday, priorityLabel, t } from './i18n.js';
 import { createEmployeePeriodPdf, createOwnerMonthlyPdf, createCategoryBookingsPdf, createCategoryZip, createWeeklyStaffPdf, downloadBlob, reportPeriodStatus } from './reports.js';
 
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.5.1';
 const isDemo = location.protocol!=='cleanflow:' && new URLSearchParams(location.search).get('demo') === '1';
 const store = await new Store().open({ demo: isDemo });
 if(isDemo && !(await store.all('staff')).length) { const { demoData } = await import('./demo.js'); await store.replace(demoData()); }

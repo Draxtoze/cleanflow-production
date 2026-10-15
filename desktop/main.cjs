@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol, net } = require('electron');
+const { app, BrowserWindow, protocol, net, dialog } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const fs = require('node:fs');
@@ -24,6 +24,13 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   main.setMenuBarVisibility(false);
   main.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   main.webContents.on('will-navigate',(event,url)=>{if(!url.startsWith('cleanflow://app/'))event.preventDefault();});
+  main.webContents.once('did-finish-load', async () => {
+   if(process.platform !== 'win32' || !app.isPackaged) return;
+   try {
+    const { t } = await import(pathToFileURL(path.join(root,'js','i18n.js')).href);
+    require('./updates.cjs').startWindowsUpdates({app,window:main,dialog,updater:require('electron-updater').autoUpdater,translate:t});
+   } catch { console.warn('CleanFlow: updates unavailable; continuing normally.'); }
+  });
   main.loadURL(`cleanflow://app/${demo?'?demo=1':''}`);
  });
  app.on('window-all-closed',()=>app.quit());

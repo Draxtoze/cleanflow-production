@@ -1,6 +1,6 @@
 {
   "name": "cleanflow-production",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Local apartment cleaning and booking operations",
   "author": "CleanFlow",
   "main": "desktop/main.cjs",
@@ -13,12 +13,14 @@
     "package:windows": "electron-builder --win nsis --x64"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "jspdf": "^4.2.1",
     "jszip": "^3.10.2"
   },
   "build": {
     "appId": "com.cleanflow.production",
     "productName": "CleanFlow",
+    "publish": [{ "provider": "github", "owner": "Draxtoze", "repo": "cleanflow-production", "private": false, "releaseType": "release" }],
     "files": [
       "desktop/**",
       "index.html",

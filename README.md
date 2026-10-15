@@ -1,4 +1,6 @@
-# CleanFlow Production — 1.5.0
+# CleanFlow Production — 1.5.1
+
+Windows 1.5.1 checks the public GitHub release feed at every startup and downloads newer stable versions in the background. Installation requires explicit approval and restarts the app. Later/closing never installs automatically. Offline use is unaffected. Install 1.5.1 manually once to enable future updates. See RELEASE-NOTES-1.5.1.md.
 
 CleanFlow is a local-first desktop/PWA application for apartment cleaning, staff assignments, balances, bookings and owners. Download the Windows installer from GitHub Releases. Production starts blank; demo fixtures and user databases are not published. Export a backup before updating. See RELEASE-NOTES-1.5.0.md, IMPLEMENTATION-CHECKLIST.md and WINDOWS-INSTALLATION.md for installation, migration and validation details.
 

@@ -1,4 +1,6 @@
-# CleanFlow 1.5.0 — macOS source guidance
+# CleanFlow 1.5.1 — macOS source guidance
+
+Automatic GitHub updates are Windows-only. macOS behavior is unchanged in 1.5.1.
 
 This release supplies shared application source and a Windows installer, not a macOS installer. Demo fixtures are excluded from production. Do not overwrite an existing native macOS application or change its storage origin without a backup and the actual launcher sources. Native macOS behavior has not been tested on this Windows machine.
 

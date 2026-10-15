@@ -1,6 +1,6 @@
-# Windows installation — CleanFlow 1.5.0
+# Windows installation — CleanFlow 1.5.1
 
-Download `CleanFlow-Setup-1.5.0.exe` from GitHub Releases and run it. Launch CleanFlow
+Download `CleanFlow-Setup-1.5.1.exe` from GitHub Releases and run it. Launch CleanFlow
 from the Start menu or desktop shortcut. No terminal or extra runtime is needed.
 The installer is unsigned; Windows may show an unknown-publisher warning.
 
