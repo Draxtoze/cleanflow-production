@@ -9,7 +9,11 @@
 - [x] 33 unit/regression tests pass; no production dependency audit vulnerabilities.
 - [x] Existing app ID, local origin, database schema and data retention unchanged.
 - [x] Packaged Windows smoke tests and updater initialization verified.
-- [ ] Installer, blockmap, latest.yml and checksums published and verified.
+- [x] Installer, blockmap, latest.yml and checksums published and verified.
+- [x] Live public GitHub feed queried successfully from the packaged Windows app:
+  version 1.5.1 returned; install-on-exit remains disabled.
+
+Release: https://github.com/Draxtoze/cleanflow-production/releases/tag/v1.5.1
 
 Real installation of a future version through the updater is not yet certified.
 
