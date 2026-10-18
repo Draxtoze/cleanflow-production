@@ -1,4 +1,8 @@
-# CleanFlow Production — 1.5.1
+# CleanFlow 2.0.0 — local demo review (not published)
+
+This dedicated branch prepares 2.0.0 for explicit demo approval. GitHub production
+remains 1.5.1. See V2-REVIEW-NOTES.md and V2-VALIDATION.md. Do not publish 2.0.0 or
+create dummy 2.0.1 before the separate user approval gates described there.
 
 Windows 1.5.1 checks the public GitHub release feed at every startup and downloads newer stable versions in the background. Installation requires explicit approval and restarts the app. Later/closing never installs automatically. Offline use is unaffected. Install 1.5.1 manually once to enable future updates. See RELEASE-NOTES-1.5.1.md.
 

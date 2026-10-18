@@ -1,4 +1,8 @@
-# Windows installation — CleanFlow 1.5.1
+# Windows installation — review 2.0.0 / released 1.5.1
+
+The local 2.0.0 installer is for isolated validation only and has not been published.
+Review the demo first. Do not replace a real installation before explicit approval
+and a safety JSON export. The 2.0.0→2.0.1 update experiment is separately gated.
 
 Download `CleanFlow-Setup-1.5.1.exe` from GitHub Releases and run it. Launch CleanFlow
 from the Start menu or desktop shortcut. No terminal or extra runtime is needed.

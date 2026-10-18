@@ -1,5 +1,6 @@
 import { validateReservationRecord } from './reservations.js';
 import { cleaningAmount, validateOperations } from './operations.js';
+import {validatePreferences} from './preferences.js';
 
 export const BACKUP_VERSION = 4;
 export const toGrosz = value => {
@@ -9,7 +10,9 @@ export const toGrosz = value => {
   if(!Number.isSafeInteger(amount))throw new Error('PLN amount is too large.');
   return amount;
 };
-export const formatPLN = grosz => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format((Number(grosz) || 0) / 100);
+let moneyLanguage='pl';
+export const setMoneyLanguage=language=>{moneyLanguage=language==='en'?'en':'pl';};
+export const formatPLN = (grosz,language=moneyLanguage) => new Intl.NumberFormat(language==='pl'?'pl-PL':'en-GB', { style: 'currency', currency: 'PLN' }).format((Number(grosz) || 0) / 100);
 export const id = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 export const localDate = date => new Date(date).toLocaleDateString('en-CA');
 export const addDays = (date, number) => { const next = new Date(`${date}T12:00:00`); next.setDate(next.getDate() + number); return localDate(next); };
@@ -36,6 +39,7 @@ export function validateBackup(data) {
   reservations.forEach(reservation => validateReservationRecord(reservation, reservations, reservation.id));
   for (const state of data.data.checkoutStates || []) if (!state.id || !state.apartmentId || !/^\d{4}-\d{2}-\d{2}$/.test(state.date) || !['ignored'].includes(state.status)) throw new Error('The backup contains an invalid checkout state.');
   validateOperations(data.data);
+  const preferences=data.data.settings.find(item=>item.id==='preferences');if(preferences)validatePreferences(preferences);
   return true;
 }
 

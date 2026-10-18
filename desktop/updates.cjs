@@ -1,20 +1,25 @@
 // Only the packaged Windows application contacts the public release feed.
 // No renderer IPC, credentials, database migration or storage changes are needed.
-function startWindowsUpdates({ app, window, dialog, updater, translate, platform = process.platform, logger = console }) {
+function startWindowsUpdates({ app, window, dialog, updater, translate, onState=()=>{}, platform = process.platform, logger = console }) {
   if (platform !== 'win32' || !app.isPackaged) return false;
   updater.autoDownload = true;
   updater.autoInstallOnAppQuit = false;
   updater.allowPrerelease = false;
   updater.allowDowngrade = false;
+  onState('checking');
+  updater.on('update-not-available',()=>onState('current'));
+  updater.on('download-progress',()=>onState('downloading'));
   let prompted = false;
   let failed = false;
   const alive = () => !window.isDestroyed();
   updater.on('error', () => {
     failed = true;
+    onState('error');
     // Offline startup must never prevent normal app use or expose raw network errors.
     logger.warn('CleanFlow: update unavailable; continuing normally.');
   });
   updater.on('update-downloaded', async info => {
+    onState('ready');
     if (prompted || failed || !alive()) return;
     prompted = true;
     try {

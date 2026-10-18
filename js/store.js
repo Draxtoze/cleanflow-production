@@ -16,6 +16,6 @@ export class Store {
   async get(store, key) { return request(this.db.transaction(store).objectStore(store).get(key)); }
   async put(store, value) { const tx = this.db.transaction(store, 'readwrite'); tx.objectStore(store).put(value); await complete(tx); return value; }
   async delete(store, key) { const tx = this.db.transaction(store, 'readwrite'); tx.objectStore(store).delete(key); await complete(tx); }
-  async data() { const values = await Promise.all(STORES.map(name => this.all(name))); return Object.fromEntries(STORES.map((name, index) => [name, values[index]])); }
+  async data() { const tx=this.db.transaction(STORES,'readonly');const done=complete(tx);const values = await Promise.all(STORES.map(name => request(tx.objectStore(name).getAll())));await done;return Object.fromEntries(STORES.map((name, index) => [name, values[index]])); }
   async replace(data) { const clean = normalized(data); const tx = this.db.transaction(STORES, 'readwrite'); STORES.forEach(name => { const store = tx.objectStore(name); store.clear(); clean[name].forEach(value => store.put(value)); }); await complete(tx); }
 }

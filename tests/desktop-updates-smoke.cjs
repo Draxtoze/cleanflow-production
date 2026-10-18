@@ -22,14 +22,14 @@ const assert = require('node:assert/strict');
    const original=dialog.showMessageBox;
    dialog.showMessageBox=async (_window,options)=>{captured=options;return {response:1};};
    // Exercise the real launcher's downloaded-event wiring without installing anything.
-   try {u.emit('update-downloaded',{version:'1.5.2'});for(let i=0;i<100&&!captured;i++)await new Promise(resolve=>setTimeout(resolve,20));}
+   try {u.emit('update-downloaded',{version:'2.0.1'});for(let i=0;i<100&&!captured;i++)await new Promise(resolve=>setTimeout(resolve,20));}
    finally {dialog.showMessageBox=original;}
    return {version:app.getVersion(),autoDownload:u.autoDownload,autoInstall:u.autoInstallOnAppQuit,config,listeners,captured};
   });
-  assert.equal(state.version,'1.5.1');assert.equal(state.autoDownload,true);assert.equal(state.autoInstall,false);
+  assert.equal(state.version,require('../package.json').version);assert.equal(state.autoDownload,true);assert.equal(state.autoInstall,false);
   assert.match(state.config,/provider: github/);assert.match(state.config,/repo: cleanflow-production/);
   assert.ok(state.listeners>0);assert.equal(state.captured.buttons[0],'Zainstaluj i uruchom ponownie');
-  assert.match(state.captured.message,/1\.5\.2/);
+  assert.match(state.captured.message,/2\.0\.1/);
   assert.equal(await page.evaluate(()=>location.origin),'cleanflow://app');
   console.log('Packaged Windows updater: initialized, public feed, approval-only installation, Polish prompt, blank data: passed.');
  } finally {await electron.close();}

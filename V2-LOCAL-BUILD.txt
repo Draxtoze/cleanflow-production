@@ -1,0 +1,5 @@
+CleanFlow 2.0.0 — LOCAL REVIEW ONLY, not published or installed over real user data.
+Windows installer: dist/CleanFlow-Setup-2.0.0.exe
+SHA256: 4d96f5379919bba11d5b3159f5ac929a971ea10925d67bc8ef15dee23806dda2
+Local blockmap and latest.yml generated and manifest SHA512 verified.
+This build is unsigned. Do not use it as an approved production release yet.

@@ -1,4 +1,8 @@
-# CleanFlow 1.5.1 — macOS source guidance
+# CleanFlow 2.0.0 — review source / macOS guidance
+
+2.0.0 is a local review build, not published. Themes, views and report configuration
+are shared web code. Filesystem automatic backups and the updater remain Windows-only.
+The optional existing macOS PDF bridge is preserved; no macOS build/test is claimed.
 
 Automatic GitHub updates are Windows-only. macOS behavior is unchanged in 1.5.1.
 
