@@ -1,4 +1,4 @@
-# CleanFlow 2.0.0 — local demo validation (not published)
+# CleanFlow 2.0.0 — validation and release authorization
 
 ## Baseline
 
@@ -63,7 +63,12 @@
 
 ## Test evidence
 
-- `node --test tests/*.test.mjs`: 39 passing tests.
+- `node --test tests/*.test.mjs`: 41 passing tests after review R4.
+- `tests/v2-review-feedback.cjs`: owner details/cards, compact essentials, footer
+  placement and selected-navigation/booking-label contrast in all six replacement themes.
+- `tests/backup-folder.test.mjs`: canonical Windows directory resolution, visible
+  Explorer launch arguments and error paths. Real demo folder with 31 files also
+  inspected through the Windows UI after clicking the corrected button.
 - `tests/v2-browser.cjs`: A/B UI restore, appearance, all view modes, four PDFs
   EN/PL, downloads, responsive layout.
 - `tests/v2-accessibility.cjs`: independent view persistence, keyboard settings,
@@ -75,15 +80,21 @@
   audits pass after the documented stale-test fixes.
 - Existing desktop PDF/updater smoke tests pass with version-independent assertions.
 - Installer SHA-256 is recorded in V2-LOCAL-BUILD.txt.
+- Installer rebuilt after R4; packaged source compared with current reviewed files.
+  Fresh isolated production profile/restart and backup-folder UI test pass.
+  Installer manifest SHA-512 and byte size verified. Still no real installation or upload.
 
 ## User review / publication gates
 
 - [x] Detailed walkthrough and technical notes in V2-REVIEW-NOTES.md.
 - [x] Real demo window opened and visually inspected on PDF Reports.
-- [ ] User validates this demo and explicitly authorizes 2.0.0 publication.
-- [ ] Finalize release-stage text/docs and publish approved production 2.0.0.
+- [x] User validated the corrected demo and explicitly authorized 2.0.0 publication
+  with the Windows installer on 19 October 2026.
+- [x] Release-stage text/docs finalized; approved production publication workflow initiated.
 - [ ] User installs 2.0.0 and separately authorizes the dummy 2.0.1 experiment.
 - [ ] Execute and document the real update; never claim it succeeded beforehand.
 
-No real-user data was loaded, no current installation replaced, and no new release
-was published. macOS and physical printing remain untested.
+No real-user data was loaded and no current installation replaced. Publication of
+2.0.0 is authorized; check GitHub Releases for the completed upload. macOS and
+physical printing remain untested. Installation and the dummy update test remain
+separate user actions and are not authorized by publication approval.

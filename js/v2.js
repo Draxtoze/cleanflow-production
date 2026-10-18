@@ -11,7 +11,7 @@ export function createV2({state,store,app,tr,esc,render,toast,reportLabels,openP
  const prefs=()=>preferencesFrom(state.data,state.language);
  const filters={staff:{query:'',status:'all'},apartments:{query:'',status:'all',owner:'all',category:'all'}};
  const money=value=>formatPLN(value,state.language);
- const swatches={ocean:'#08756b',forest:'#386332',night:'#253b51',indigo:'#514696',amber:'#a87c23',plum:'#824767'};
+ const swatches={ocean:'#08756b',forest:'#434c5e',night:'#88c0d0',indigo:'#1e66f5',amber:'#51505a',plum:'#9b4057'};
  async function invoke(method,...args){const response=await window.cleanflowDesktop[method](...args);if(!response.ok)throw Error(text('backupError'));return response.value;}
  async function updatePreferences(change) {
   const next=validatePreferences({...prefs(),...change});const index=state.data.settings.findIndex(item=>item.id==='preferences');
@@ -33,12 +33,12 @@ export function createV2({state,store,app,tr,esc,render,toast,reportLabels,openP
  function backupMarkup(){
   if(!runtime.backups)return `<p>${label('backupUnavailable')}</p>${isDemo?`<p>${label('demoWebBackups')}</p><p>${label('demoRetentionPreview')}</p>`:''}`;
   const status=backupError?'backupError':!prefs().autoBackupEnabled?'backupDisabled':backupState?.createdToday?'backedUp':'backupPending';
-  return `<div class="settings-status" role="status"><strong>${label(status)}</strong><div class="backup-meta"><span>${label('lastBackup')}: ${backupState?.lastSuccess?esc(new Intl.DateTimeFormat(state.language==='pl'?'pl-PL':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(new Date(backupState.lastSuccess))):label('never')}</span><span>${esc(text('backupCount',{count:backupState?.count??0}))}</span></div></div>${isDemo?`<p>${label('demoRetentionPreview')}</p>`:''}`;
+  return `<div class="settings-status" role="status"><strong>${label(status)}</strong><div class="backup-meta"><span>${label('lastBackup')}: ${backupState?.lastSuccess?esc(new Intl.DateTimeFormat(state.language==='pl'?'pl-PL':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(new Date(backupState.lastSuccess))):label('never')}</span><span>${esc(text('backupCount',{count:backupState?.count??0}))}</span></div></div><p>${label('dailyBackupHelp')}</p>${isDemo?`<p>${label('demoBackups')}</p>`:''}`;
  }
- async function refreshBackup(){if(runtime.backups){try{backupState=await invoke('backupStatus');}catch{backupError=true;}}}
+ async function refreshBackup(){if(runtime.backups){try{backupState=await invoke('backupStatus');backupError=false;}catch{backupError=true;}}}
  async function runBackup({manual=false}={}) {
   if(!runtime.backups||backupBusy||(!manual&&!prefs().autoBackupEnabled))return;
-  backupBusy=true;try{await saveQueue;backupState=await invoke('createBackup',createBackup(await store.data()));backupError=false;if(manual)toast(text('backupSaved'));}catch{backupError=true;if(manual)toast(text('backupError'),'warning');}finally{backupBusy=false;document.querySelectorAll('[data-v2-backup-status]').forEach(holder=>holder.innerHTML=backupMarkup());}
+  backupBusy=true;try{await saveQueue;backupState=await invoke('createBackup',createBackup(await store.data()));backupError=false;if(manual)toast(text(backupState.created?'backupSaved':'backupExists'));}catch{backupError=true;if(manual)toast(text('backupError'),'warning');}finally{backupBusy=false;document.querySelectorAll('[data-v2-backup-status]').forEach(holder=>holder.innerHTML=backupMarkup());}
  }
  function updateCopy(){return runtime.updates?text({checking:'updateChecking',current:'updateCurrent',downloading:'updateDownloading',ready:'updateReady',error:'updateError'}[runtime.updateState]||'updateChecking'):text('updateUnavailable');}
  async function settings(){
@@ -56,7 +56,14 @@ export function createV2({state,store,app,tr,esc,render,toast,reportLabels,openP
   view.root.querySelector('[data-backup-enabled]').onchange=async event=>{await save({autoBackupEnabled:event.target.checked});if(event.target.checked)await runBackup();view.root.querySelector('[data-v2-backup-status]').innerHTML=backupMarkup();};
   view.root.querySelector('[data-retention]').onchange=event=>{const input=event.target,n=Number(input.value);if(!input.value||!Number.isInteger(n)||n<1||n>365){input.setAttribute('aria-invalid','true');error.textContent=text('invalidRetention');return;}input.removeAttribute('aria-invalid');save({autoBackupRetention:n});};
   view.root.querySelector('[data-backup-now]').onclick=async event=>{event.target.disabled=true;await runBackup({manual:true});event.target.disabled=false;};
-  view.root.querySelector('[data-backup-folder]').onclick=()=>invoke('openBackupFolder').catch(()=>toast(text('backupError'),'warning'));
+  view.root.querySelector('[data-backup-folder]').onclick=async event=>{
+   const button=event.currentTarget;button.disabled=true;button.textContent=text('openingFolder');
+   let notice=view.root.querySelector('[data-folder-feedback]');if(!notice){notice=document.createElement('p');notice.dataset.folderFeedback='';notice.setAttribute('role','status');button.closest('.toolbar').after(notice);}
+   notice.textContent='';
+   try{const result=await invoke('openBackupFolder');notice.textContent=text('folderOpened',{path:result.directory});}
+   catch{notice.textContent=text('folderError');toast(text('folderError'),'warning');}
+   finally{button.disabled=false;button.textContent=text('openBackupFolder');}
+  };
   view.root.querySelector('[data-manual-link]').onclick=async()=>{await view.close();state.page='backup';render();};
   view.root.querySelector('[data-about-link]').onclick=async()=>{await view.close();state.page='about';render();};
   view.root.querySelector('[data-dog-settings]').onclick=async()=>{await view.close();openCleaningSettings();};

@@ -1,5 +1,8 @@
-CleanFlow 2.0.0 — LOCAL REVIEW ONLY, not published or installed over real user data.
+CleanFlow 2.0.0 — production publication approved; not installed over real user data.
 Windows installer: dist/CleanFlow-Setup-2.0.0.exe
-SHA256: 4d96f5379919bba11d5b3159f5ac929a971ea10925d67bc8ef15dee23806dda2
+SHA256: 00aee3fd1bd42e992e09f3d7106fcbef7fd7fdd9c3566d6f26662ba2e0df687b
+Rebuilt after review R4: owner/card/sidebar changes, replacement palettes and canonical backup-folder opening.
+Size: 127634332 bytes. Final production labels included. Package source matches reviewed files; demo module and database/backup artifacts excluded.
+41 unit tests, six-theme visual regression and isolated production package/restart/folder test passed.
 Local blockmap and latest.yml generated and manifest SHA512 verified.
-This build is unsigned. Do not use it as an approved production release yet.
+This build is unsigned. Export a JSON safety backup before installing or updating.

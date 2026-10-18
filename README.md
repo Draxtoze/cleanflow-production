@@ -1,10 +1,11 @@
-# CleanFlow 2.0.0 — local demo review (not published)
+# CleanFlow 2.0.0
 
-This dedicated branch prepares 2.0.0 for explicit demo approval. GitHub production
-remains 1.5.1. See V2-REVIEW-NOTES.md and V2-VALIDATION.md. Do not publish 2.0.0 or
-create dummy 2.0.1 before the separate user approval gates described there.
+Production release approved after local demo review. See RELEASE-NOTES-2.0.0.md
+for appearance, report configuration, views and automatic backup improvements.
+Production starts blank. No user database, automatic backup or demo module is included.
+The separate dummy 2.0.1 update experiment has not been authorized or performed.
 
-Windows 1.5.1 checks the public GitHub release feed at every startup and downloads newer stable versions in the background. Installation requires explicit approval and restarts the app. Later/closing never installs automatically. Offline use is unaffected. Install 1.5.1 manually once to enable future updates. See RELEASE-NOTES-1.5.1.md.
+Windows versions 1.5.1 and later check the public GitHub release feed at every startup and download newer stable versions in the background. Installation requires explicit approval and restarts the app. Later/closing never installs automatically. Offline use is unaffected. Install the current Windows release manually if your older installation does not support updates. See RELEASE-NOTES-1.5.1.md.
 
 CleanFlow is a local-first desktop/PWA application for apartment cleaning, staff assignments, balances, bookings and owners. Download the Windows installer from GitHub Releases. Production starts blank; demo fixtures and user databases are not published. Export a backup before updating. See RELEASE-NOTES-1.5.0.md, IMPLEMENTATION-CHECKLIST.md and WINDOWS-INSTALLATION.md for installation, migration and validation details.
 

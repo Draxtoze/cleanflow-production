@@ -34,7 +34,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    validate(backup);const prefs=backup.data.settings.find(item=>item.id==='preferences');
    return backups.create(backup,prefs?.autoBackupRetention??31);
   });
-  handle('cleanflow:backup-folder',async()=>{if(!desktopAvailable)throw Error('Unavailable');await backups.status();if(await shell.openPath(directory))throw Error('Unavailable');return true;});
+  handle('cleanflow:backup-folder',async()=>{if(!desktopAvailable)throw Error('Unavailable');return require('./backup-folder.cjs').openBackupDirectory({directory,backups,shell});});
   handle('cleanflow:demo-backups',async backup=>{
    if(!demo||!desktopAvailable)throw Error('Unavailable');validate(backup);
    if(!demoSeedPromise)demoSeedPromise=(async()=>{

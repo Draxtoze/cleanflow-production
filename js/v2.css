@@ -1,9 +1,9 @@
 :root{--surface:#fff;--surface-soft:#edf5f3;--page:#f3f7f6;--accent:#08756b;--ink:#173f44;--muted:#476366;--line:#b1cbc7;--sidebar:#173f44;--on-accent:#fff;--text-scale:1}
-:root[data-theme=forest]{--surface:#fff;--surface-soft:#edf4e9;--page:#f5f7f1;--accent:#386332;--ink:#283e24;--muted:#52684b;--line:#b6c9ae;--sidebar:#203e2b}
-:root[data-theme=night]{--surface:#202d3b;--surface-soft:#293b4b;--page:#15202d;--accent:#82d9cf;--ink:#ecf4f7;--muted:#bfd1dd;--line:#557181;--sidebar:#101a25;--on-accent:#102e30;color-scheme:dark}
-:root[data-theme=indigo]{--surface:#fff;--surface-soft:#efeffa;--page:#f6f6fb;--accent:#514696;--ink:#302957;--muted:#615b7c;--line:#bcb6d9;--sidebar:#302957}
-:root[data-theme=amber]{--surface:#fffdf8;--surface-soft:#fbf1dd;--page:#faf7f0;--accent:#866014;--ink:#493a20;--muted:#716247;--line:#d4c19c;--sidebar:#4b3c24}
-:root[data-theme=plum]{--surface:#fff;--surface-soft:#f7edf4;--page:#faf5f9;--accent:#824767;--ink:#522c43;--muted:#765b6b;--line:#d3b7c8;--sidebar:#522c43}
+:root[data-theme=forest]{--surface:#fff;--surface-soft:#e5e9f0;--page:#eceff4;--accent:#434c5e;--ink:#2e3440;--muted:#4c566a;--line:#b8c2d0;--sidebar:#2e3440}
+:root[data-theme=night]{--surface:#3b4252;--surface-soft:#434c5e;--page:#2e3440;--accent:#88c0d0;--ink:#eceff4;--muted:#d8dee9;--line:#7c8ba3;--sidebar:#242933;--on-accent:#2e3440;color-scheme:dark}
+:root[data-theme=indigo]{--surface:#fff;--surface-soft:#e6e9ef;--page:#eff1f5;--accent:#1e66f5;--ink:#4c4f69;--muted:#5c5f77;--line:#bcc0cc;--sidebar:#4c4f69}
+:root[data-theme=amber]{--surface:#fffefa;--surface-soft:#f0e9dc;--page:#f7f4ed;--accent:#51505a;--ink:#35343d;--muted:#66616b;--line:#cdc3b3;--sidebar:#35343d}
+:root[data-theme=plum]{--surface:#fff;--surface-soft:#f6e9ec;--page:#fcf7f8;--accent:#9b4057;--ink:#49353e;--muted:#725d68;--line:#d7bbc4;--sidebar:#49353e}
 :root[data-text-size=small]{--text-scale:.9}:root[data-text-size=large]{--text-scale:1.15}
 body{background:var(--page);color:var(--ink);font-size:calc(15px * var(--text-scale));transition:background-color .18s,color .18s}
 aside{background:var(--sidebar)}main{min-width:0}main>*,.report-card{animation:v2-enter .18s ease-out}.card,.balance-card,.report-panel,.modal,.empty,.category-overview{background:var(--surface);color:var(--ink);border-color:var(--line)}.card p,.muted,dt{color:var(--muted)}
@@ -22,3 +22,15 @@ nav button,.modal button{font-size:calc(14px * var(--text-scale))}.page-heading 
 @media(max-width:850px){.app-shell{grid-template-columns:minmax(0,1fr)}aside{width:100%;max-width:100vw}nav{max-width:100%;min-width:0;overflow-x:auto}.report-catalog,.about-grid{grid-template-columns:minmax(0,1fr)}}
 .theme-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.theme-choices button{min-width:0}.v2-dialog>header{position:sticky;top:0;background:var(--surface);z-index:5}button:disabled{opacity:.45;cursor:not-allowed;filter:none}nav button.selected{background:var(--accent);color:var(--on-accent)}.language-switch button{background:transparent;border-color:#ffffff55;color:#fff}.brand-note{color:#dce8e5}.app-version{color:#dce8e5}
 @media(max-width:480px){.theme-choices{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-backdrop{padding:10px}.report-config .toolbar{flex-wrap:wrap}}
+/* Additional themes adapt Nord and Catppuccin palettes with neutral Linen/Rose variants.
+   Sources: https://www.nordtheme.com/ and https://catppuccin.com/palette/.
+   Ocean retains CleanFlow's original palette; business-status colors stay unchanged. */
+.apartment-summary{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin:12px 0}.apartment-summary .apartment-category{margin:0}.apartment-owner{display:grid;gap:3px;text-align:right;max-width:52%;margin:0}.apartment-owner small{font-weight:400}.apartment-owner strong{font-size:13px;line-height:1.4}.cards[data-view=details] .apartment-summary{display:none}
+.cards[data-view=compact] .apartment-summary,.cards[data-view=compact] .pill,.cards[data-view=compact] .price small{display:none}.cards[data-view=compact] .card-actions{margin-top:10px;gap:5px;flex-wrap:wrap}.cards[data-view=compact] .card-actions button{padding:6px 8px;font-size:12px}.cards[data-view=compact] dl{margin:8px 0;gap:6px}.cards[data-view=compact] h2{margin-bottom:8px}
+@media(min-width:851px){aside{overflow:hidden}.brand,.brand-note,.app-version,.language-switch,.save-settings{flex-shrink:0}aside nav{overflow-y:auto;min-height:0;flex-shrink:1}.save-settings{margin-top:auto;padding-top:18px;min-height:55px}.language-switch{margin-bottom:14px}}
+@media(max-width:850px){.save-settings{position:fixed;inset:auto auto 0 0;padding:7px 12px;background:var(--sidebar);width:100%;z-index:6;min-height:48px}.save-settings .save-state{display:block}.brand{padding-right:0}main{padding-bottom:75px}}
+/* Calendar labels and tracks must share theme surfaces, not white inherited fills. */
+.timeline-label,.timeline-head .timeline-label,.timeline-date{background:var(--surface-soft);color:var(--ink);border-color:var(--line)}.timeline-head{background:var(--surface-soft)}.timeline-track{background:var(--surface)}.timeline-row:nth-child(odd) .timeline-track{background:var(--surface-soft)}.timeline-scroll{background:var(--surface);border-color:var(--line)}
+:root[data-theme=night] .timeline-date.today,:root[data-theme=night] .day-header.today{background:#fff2ba;color:#493a20}:root[data-theme=night] .timeline-empty{background:transparent}:root[data-theme=night] .timeline-empty:hover{background:#364e60}
+:root[data-theme=night] .calendar-corner,:root[data-theme=night] .staff-cell,:root[data-theme=night] .day-header{color:var(--ink)}nav button.selected,nav button.selected:hover{background:var(--accent);color:var(--on-accent)}:root[data-theme=ocean] nav button.selected{background:#285860;color:#fff}
+.timeline-label.selection-apartment{color:#493a20}:root[data-theme=night] .timeline-date.date-hover{background:#ffe6a1;color:#694800}
