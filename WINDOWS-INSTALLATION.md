@@ -1,10 +1,10 @@
-# Windows installation — 2.0.0
+# Windows installation — 2.0.1
 
 Version 2.0.0 was approved for publication after demo review. Export a safety JSON
 backup before upgrading. Publishing does not install or replace this computer's app.
 The 2.0.0→2.0.1 update experiment still requires separate authorization.
 
-Download `CleanFlow-Setup-2.0.0.exe` from GitHub Releases and run it. Launch CleanFlow
+Download `CleanFlow-Setup-2.0.1.exe` from GitHub Releases and run it. Launch CleanFlow
 from the Start menu or desktop shortcut. No terminal or extra runtime is needed.
 The installer is unsigned; Windows may show an unknown-publisher warning.
 

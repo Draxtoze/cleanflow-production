@@ -1,6 +1,6 @@
-# CleanFlow 2.0.0 — macOS guidance
+# CleanFlow 2.0.1 — macOS guidance
 
-2.0.0 includes production source approved after demo review. Themes, views and report configuration
+2.0.1 includes production source approved after demo review. Themes, views and report configuration
 are shared web code. Filesystem automatic backups and the updater remain Windows-only.
 The optional existing macOS PDF bridge is preserved; no macOS build/test is claimed.
 

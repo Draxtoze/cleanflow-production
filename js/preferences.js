@@ -1,4 +1,4 @@
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '2.0.1';
 export const SCHEMA_VERSION = 4;
 export const THEMES = ['ocean','forest','night','indigo','amber','plum'];
 export const TEXT_SIZES = ['small','normal','large'];

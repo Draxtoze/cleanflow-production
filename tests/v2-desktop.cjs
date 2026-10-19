@@ -13,7 +13,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=r
   await page.locator('[data-retention]').fill('0');await page.locator('[data-retention]').dispatchEvent('change');assert.equal(await page.locator('[data-retention]').getAttribute('aria-invalid'),'true');await page.locator('[data-retention]').fill('31');await page.locator('[data-retention]').dispatchEvent('change');
   await page.locator('[data-theme-choice=forest]').click();await page.locator('[data-size=large]').click();await page.keyboard.press('Escape');await page.reload();assert.equal(await page.locator('html').getAttribute('data-theme'),'forest');
   const files=await fs.readdir(path.join(profile,'automatic-backups'));assert.equal(files.filter(name=>name.endsWith('.json')).length,31);assert.equal(files.some(name=>name.endsWith('.tmp')),false);
-  for(const name of files){const data=JSON.parse(await fs.readFile(path.join(profile,'automatic-backups',name),'utf8'));assert.equal(data.automatic.manager,'CleanFlow-daily-v1');assert.equal(data.backup.appVersion,'2.0.0');}
+  for(const name of files){const data=JSON.parse(await fs.readFile(path.join(profile,'automatic-backups',name),'utf8'));assert.equal(data.automatic.manager,'CleanFlow-daily-v1');assert.equal(data.backup.appVersion,'2.0.1');}
   assert.deepEqual(errors,[]);console.log('Electron demo: separate profile/database, 32 real synthetic days reduced to 31 files, immutable same-day file, settings validation and persistence: passed.');
  }finally{await app.close();}
 })().catch(error=>{console.error(error);process.exit(1);});
