@@ -9,6 +9,8 @@ import {APP_VERSION,preferencesFrom} from './preferences.js';
 import {createBackup,readBackup} from './backup.js';
 import {createV2} from './v2.js';
 import {createHistoryUI} from './history-ui.js';
+import {createPlanningUI} from './planning-ui.js';
+import {pendingCheckout} from './planning.js';
 const desktopInfo=window.cleanflowDesktop?await window.cleanflowDesktop.info():null;
 const isDemo = Boolean(desktopInfo?.value?.demo) || (location.protocol!=='cleanflow:' && new URLSearchParams(location.search).get('demo') === '1');
 const store = await new Store().open({ demo: isDemo });
@@ -35,6 +37,7 @@ store.historyEnabled=true;
 store.onHistory=record=>{const index=state.data.settings.findIndex(item=>item.id===record.id);if(index<0)state.data.settings.push(record);else state.data.settings[index]=record;};
 const historyUI=createHistoryUI({state,store,tr,esc,modal,toast,render,onRestored:async()=>{state.data=migrateOperations(await store.data());v2.restore();}});
 function toast(message, type = 'success') { const item = document.createElement('div'); item.className = `toast ${type}`; item.textContent = message; document.querySelector('#toast-region').append(item);localize(item); setTimeout(() => item.remove(), 3200); }
+const planningUI=createPlanningUI({state,store,tr,esc,dateLabel,formatPLN,installDogFields,readCleaningSnapshot,onSaved:async message=>{state.data=migrateOperations(await store.data());render();toast(message);}});
 function modal(title, body, onSubmit, { danger = false, submit = tr('legacy.save') } = {}) {
   const root = document.createElement('div'); root.className = 'modal-backdrop'; root.innerHTML = `<section class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}"><header><h2>${esc(title)}</h2><button class="icon" data-close aria-label="${esc(tr('legacy.close'))}">×</button></header><div class="modal-body">${body}</div><footer><button class="secondary" data-close>${esc(tr('legacy.cancel'))}</button><button class="${danger ? 'danger' : ''}" data-submit>${esc(submit)}</button></footer></section>`;
   const close = () => root.remove(); root.querySelectorAll('[data-close]').forEach(button => button.onclick = close);
@@ -401,54 +404,17 @@ function openAssignment(job, staffId, date) {
   const selected = new Set((job?.apartments || []).map(item => item.apartmentId));
   const assignedElsewhere = new Set(byId('assignments').filter(item => item.date === effectiveDate && item.id !== job?.id).flatMap(item => item.apartments || []).map(apartment => apartment.apartmentId));
   const activeOptions = active('apartments').filter(apartment => selected.has(apartment.id) || !assignedElsewhere.has(apartment.id)).map(apartment => {
-    const departure = byId('reservations').find(reservation => reservation.apartmentId === apartment.id && reservation.checkOut === effectiveDate);
-    const priority = Boolean(departure && byId('reservations').some(reservation => reservation.apartmentId === apartment.id && reservation.checkIn === effectiveDate));
+    const pending=pendingCheckout(state.data,apartment.id,effectiveDate);
+    const departure=pending?.departure;
+    const priority=Boolean(pending?.priority);
     return { id: apartment.id, name: apartment.name, categoryId: apartment.categoryId, priceGrosz: apartment.priceGrosz, snapshot: savedSnapshots.get(apartment.id) || checkoutDogSnapshot(snapshotApartment(apartment),departure,find('settings','dogBonus')?.amountGrosz||0), departure, priority, checkoutStatus: departure ? checkoutCleaningStatus(apartment.id, effectiveDate) : null };
   }).sort((left, right) => Number(right.priority) - Number(left.priority) || Number(Boolean(right.departure)) - Number(Boolean(left.departure)) || left.name.localeCompare(right.name));
   const archivedOptions = (job?.apartments || []).filter(item => !activeOptions.some(option => option.id === item.apartmentId)).map(item => ({ id: item.apartmentId, name: `${item.name} (${tr('v2.archived')})`, priceGrosz: item.priceGrosz, snapshot: item, priority: false }));
   const options = [...activeOptions, ...archivedOptions];
-  const choices = options.length ? options.map(option => { const checkoutHint = option.departure ? `${tr('cleaning.checkoutToday')} · ${option.priority ? tr('cleaning.priorityCheckout') : tr(`cleaning.${option.checkoutStatus}`)}` : ''; return `<div class="check ${option.priority ? 'priority-choice' : ''}" data-apartment-option data-priority="${option.priority}" data-suggested="${Boolean(option.departure && option.checkoutStatus === 'toPlan')}" data-search="${esc(`${option.name} ${categoryName(option.categoryId)}`).toLowerCase()}"><input type="checkbox" name="apartment" value="${option.id}" ${selected.has(option.id) ? 'checked' : ''}/><span>${esc(option.name)} <small>${esc(categoryName(option.categoryId))} · ${formatPLN(option.priceGrosz)}${checkoutHint ? ` · ${esc(checkoutHint)}` : ''}</small></span></div>`; }).join('') : `<p class="muted">${esc(tr('legacy.noActiveApartmentsAddApartmentsFirst'))}</p>`;
-  const isPlanned = job?.status === 'planned';
-  const title = job?.status === 'confirmed' ? tr('ops.correctConfirmed') : job ? tr('legacy.reviewPlannedCleaning') : tr('legacy.planAssignment');
-  const guidance = isPlanned ? `<p class="review-note">${esc(tr('ops.reviewGuidance'))}</p>` : '';
-  const dialog = modal(title, `<form><p><strong>${esc(staff?.name || tr('legacy.staff'))} · ${esc(dateLabel(effectiveDate))} ${effectiveDate.slice(0, 4)}</strong></p>${job?.status === 'confirmed' ? `<p class="warning">${esc(tr('ops.confirmedChange'))}</p>` : guidance}<label class="search-field modal-search"><span>${esc(tr('legacy.searchApartments'))}</span><input data-assignment-search type="search" placeholder="${esc(tr('legacy.searchByApartmentNameOrAddress'))}" /></label><p class="muted assignment-search-note" data-assignment-search-note>${esc(tr('legacy.searchForAnApartmentToAddItToThis'))}</p><fieldset><legend>${isPlanned ? tr('legacy.apartmentsActuallyCleaned') : tr('legacy.apartmentsToAssign')}</legend>${choices}</fieldset><label>${esc(tr('ops.notesHelp'))}<textarea name="cleaningNotes" maxlength="500">${esc(job?.notes)}</textarea></label><p data-assignment-total></p><p class="form-error" role="alert"></p></form>`, async form => {
-    const chosen = [...form.querySelectorAll('input[name="apartment"]:checked')].map(input => readCleaningSnapshot(input,options));
-    if (!chosen.length) {
-      if (!job) throw new Error(tr('ops.selectApartment'));
-      if (job.status === 'confirmed') throw new Error(tr('ops.keepConfirmed'));
-      if (!window.confirm(tr('ops.cancelPlanCopy',{staff:staff.name,date:dateLabel(effectiveDate)}))) return false;
-      await remove('assignments', job.id);
-      toast(tr('legacy.plannedAssignmentRemoved'));
-      return;
-    }
-    const update = { id: job?.id || id(), staffId: effectiveStaff, date: effectiveDate, status: job?.status==='confirmed'?'confirmed':'planned', apartments: chosen, notes:form.elements.cleaningNotes.value.trim(), createdAt: job?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
-    if(job?.status==='confirmed'&&!window.confirm(tr('ops.confirmedChange')))return false;
-    await save('assignments', update);
-    if (job?.status === 'confirmed') toast(tr('ops.confirmedUpdated'), 'warning');
-  }, { danger: job?.status === 'confirmed', submit: job?.status === 'confirmed' ? tr('ops.save') : tr('legacy.savePlan') });
-  installDogFields(dialog,options);
-  const refreshTotal=()=>{const form=dialog.querySelector('form');try{const chosen=[...form.querySelectorAll('input[name=apartment]:checked')].map(input=>readCleaningSnapshot(input,options));dialog.querySelector('[data-assignment-total]').innerHTML=`<span>${esc(tr('ops.total'))}</span>: <span data-user-text>${esc(formatPLN(assignmentTotal({apartments:chosen})))}</span>`;}catch{dialog.querySelector('[data-assignment-total]').textContent=tr('ops.bonusInvalid');}};
-  dialog.querySelector('form').addEventListener('input',refreshTotal);dialog.addEventListener('cleanflow-language',refreshTotal);refreshTotal();
-  if (isPlanned) {
-    const cancel=document.createElement('button');cancel.className='danger';cancel.textContent=tr('ops.cancelPlan');cancel.onclick=async()=>{if(!window.confirm(tr('ops.cancelPlanCopy',{staff:staff.name,date:dateLabel(effectiveDate)})))return;await remove('assignments',job.id);dialog.remove();};dialog.querySelector('footer').append(cancel);
-    
-    const confirm = document.createElement('button');
-    confirm.className = 'success';
-    confirm.textContent = tr('legacy.confirmCompleted');
-    confirm.onclick = async () => {
-      const form = dialog.querySelector('form');
-      const notice = dialog.querySelector('.form-error');
-      try {
-        const apartments = [...form.querySelectorAll('input[name="apartment"]:checked')].map(input => readCleaningSnapshot(input,options));
-        if (!apartments.length) throw new Error(tr('legacy.selectTheApartmentSActuallyCleanedOrUseSave'));
-        await save('assignments', { ...job, status: 'confirmed', apartments, notes:form.elements.cleaningNotes.value.trim(), confirmedAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
-        dialog.remove();
-        toast(tr('legacy.completedCleaningConfirmedRealBalanceUpdated'));
-      } catch (error) { notice.textContent = localizedError(error);localize(notice); }
-    };
-    dialog.querySelector('footer').prepend(confirm);
-  }
-}function openPayment(staffId, payment) { const staff = find('staff', staffId); const summary = staffSummary(staffId, byId('assignments'), byId('payments').filter(item => item.id !== payment?.id)); modal(payment ? tr('legacy.editPayment') : tr('legacy.recordPayment'), `<form><p><strong>${esc(staff?.name || tr('legacy.staff'))}</strong> · ${esc(tr('v2.balance'))}: ${formatPLN(summary.dueGrosz)}</p><label>${esc(tr('legacy.amountPln'))}<input name="amount" inputmode="decimal" required value="${payment ? (payment.amountGrosz / 100).toFixed(2) : ''}" /></label><label>${esc(tr('legacy.paymentDate'))}<input name="date" type="date" required value="${esc(payment?.date || localDate(new Date()))}" /></label><label>${esc(tr('legacy.method'))}<input name="method" maxlength="60" value="${esc(payment?.method)}" placeholder="${esc(tr('legacy.eGBankTransfer'))}" /></label><label>${esc(tr('legacy.note'))}<textarea name="note" maxlength="300">${esc(payment?.note)}</textarea></label><p class="form-error" role="alert"></p></form>`, async form => { const amountGrosz = toGrosz(form.elements.amount.value); if (amountGrosz <= 0) throw new Error(tr('legacy.paymentMustBeGreaterThanZero')); const overpayment = amountGrosz > summary.dueGrosz && !payment; if (overpayment && !window.confirm(tr('v2.overpayment',{amount:formatPLN(amountGrosz-summary.dueGrosz)}))) return; await save('payments', { id: payment?.id || id(), staffId, amountGrosz, date: form.elements.date.value, method: form.elements.method.value.trim(), note: form.elements.note.value.trim(), createdAt: payment?.createdAt || new Date().toISOString() }); }, { submit: payment ? tr('legacy.savePayment') : tr('legacy.confirmPayment') }); }
+  options.forEach(option=>option.categoryName=categoryName(option.categoryId));
+  return planningUI.open({job,staff,date:effectiveDate,options});
+}
+function openPayment(staffId, payment) { const staff = find('staff', staffId); const summary = staffSummary(staffId, byId('assignments'), byId('payments').filter(item => item.id !== payment?.id)); modal(payment ? tr('legacy.editPayment') : tr('legacy.recordPayment'), `<form><p><strong>${esc(staff?.name || tr('legacy.staff'))}</strong> · ${esc(tr('v2.balance'))}: ${formatPLN(summary.dueGrosz)}</p><label>${esc(tr('legacy.amountPln'))}<input name="amount" inputmode="decimal" required value="${payment ? (payment.amountGrosz / 100).toFixed(2) : ''}" /></label><label>${esc(tr('legacy.paymentDate'))}<input name="date" type="date" required value="${esc(payment?.date || localDate(new Date()))}" /></label><label>${esc(tr('legacy.method'))}<input name="method" maxlength="60" value="${esc(payment?.method)}" placeholder="${esc(tr('legacy.eGBankTransfer'))}" /></label><label>${esc(tr('legacy.note'))}<textarea name="note" maxlength="300">${esc(payment?.note)}</textarea></label><p class="form-error" role="alert"></p></form>`, async form => { const amountGrosz = toGrosz(form.elements.amount.value); if (amountGrosz <= 0) throw new Error(tr('legacy.paymentMustBeGreaterThanZero')); const overpayment = amountGrosz > summary.dueGrosz && !payment; if (overpayment && !window.confirm(tr('v2.overpayment',{amount:formatPLN(amountGrosz-summary.dueGrosz)}))) return; await save('payments', { id: payment?.id || id(), staffId, amountGrosz, date: form.elements.date.value, method: form.elements.method.value.trim(), note: form.elements.note.value.trim(), createdAt: payment?.createdAt || new Date().toISOString() }); }, { submit: payment ? tr('legacy.savePayment') : tr('legacy.confirmPayment') }); }
 function paymentHistory(staffId) { const staff=find('staff',staffId); const payments=byId('payments').filter(item=>item.staffId===staffId).sort((a,b)=>b.date.localeCompare(a.date)); const root=modal(`${tr('payments.history')} — ${staff?.name||''}`,`<form><div class="payment-history">${payments.length?payments.map(payment=>`<div><span>${esc(payment.date)} · ${esc(payment.method||tr('v2.noMethod'))}${payment.note?` · ${esc(payment.note)}`:''}</span><strong>−${formatPLN(payment.amountGrosz)}</strong><button type="button" class="text" data-edit-payment="${payment.id}">${esc(tr('legacy.edit'))}</button><button type="button" class="text danger-text" data-delete-payment="${payment.id}">${esc(tr('legacy.delete'))}</button></div>`).join(''):`<p class="muted">${esc(tr('legacy.noPaymentsRecorded'))}</p>`}</div><p class="form-error" role="alert"></p></form>`,async()=>{}, {submit:tr('legacy.close')}); root.querySelector('[data-submit]').onclick=()=>root.remove(); root.querySelectorAll('[data-edit-payment]').forEach(button=>button.onclick=()=>{root.remove();const payment=find('payments',button.dataset.editPayment);openPayment(payment.staffId,payment);}); root.querySelectorAll('[data-delete-payment]').forEach(button=>button.onclick=()=>{root.remove();deletePayment(find('payments',button.dataset.deletePayment));}); }function deletePayment(payment) { modal(tr('legacy.deletePayment'), `<form><p>${esc(tr('v2.deletePaymentCopy',{amount:formatPLN(payment.amountGrosz),date:formatBookingDate(state.language,payment.date)}))}</p><p class="form-error" role="alert"></p></form>`, () => remove('payments', payment.id), { danger: true, submit: tr('legacy.deletePayment120') }); }
 async function exportBackup() { try{const backup=createBackup(await store.data());downloadBlob(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),`cleanflow-backup-${localDate(new Date())}.json`);toast(tr('v2.manualSaved'));}catch{toast(tr('ops.saveError'),'warning');} }
 async function importBackup() { const file=document.querySelector('#import-file').files[0];if(!file)return toast(tr('backup.noFile'),'warning');try { const incoming=JSON.parse(await file.text());const data=await readBackup(incoming);modal(tr('v2.importTitle'),`<form><p data-user-text>${esc(file.name)}</p><p>${esc(tr('v2.importCopy'))}</p><p class="form-error" role="alert"></p></form>`,async()=>{const restored=structuredClone(data);if(!restored.settings.some(item=>item.id==='preferences'))restored.settings.push(preferencesFrom(restored,state.language));await store.replace(restored);state.data=migrateOperations(await store.data());v2.restore();toast(tr('v2.importSuccess'));render();},{danger:true,submit:tr('v2.importConfirm')});}catch {toast(tr('v2.importError'),'warning');} }

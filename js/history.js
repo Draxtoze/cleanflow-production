@@ -1,5 +1,6 @@
 // Journal records live in the existing settings store so complete v4 backups
 // retain them without changing the application's identity or IndexedDB schema.
+import {validatePlanningWrite} from './planning.js';
 export const HISTORY_PREFIX='__cleanflow_history__:';
 let lastEventTime=0;
 export const HISTORY_STORES=['staff','apartments','categories','owners','assignments','payments','reservations','checkoutStates','settings'];
@@ -44,6 +45,7 @@ export function prepareUndo(data,eventId,validate){
  if(!entry||['undo','import'].includes(entry.action)||entries.some(e=>e.undoOf===eventId))throw Error('history.unavailable');
  const candidate=structuredClone(data);
  for(const change of entry.changes){
+  if(change.store==='assignments'&&change.before!==null&&!change.before.apartments?.length)throw Error('history.conflict');
   const current=candidate[change.store].find(item=>item.id===change.id)||null;
   if(!sameRecord(current,change.after))throw Error('history.changed');
   const index=candidate[change.store].findIndex(item=>item.id===change.id);
@@ -52,6 +54,7 @@ export function prepareUndo(data,eventId,validate){
  }
  try{
   const baseline=relationIssues(data);if([...relationIssues(candidate)].some(issue=>!baseline.has(issue)))throw Error('dependency');
+  for(const change of entry.changes)if(change.store==='assignments'&&change.before)validatePlanningWrite(change.before,candidate.assignments);
   validate(candidate);
  }catch{throw Error('history.conflict');}
  return {entry,changes:entry.changes.map(c=>({store:c.store,id:c.id,before:structuredClone(c.after),after:structuredClone(c.before)}))};

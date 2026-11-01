@@ -1,4 +1,15 @@
-# CleanFlow 2.1.1
+# CleanFlow 2.1.2
+
+Version 2.1.2 improves planning, checkout suggestions, selection ordering and
+safe cancellation of planned or confirmed cleanings. Confirmed cancellation
+shows the real amount deducted, preserves payments and supports safe history undo.
+See RELEASE-NOTES-2.1.2.md.
+
+Publication of 2.1.2 was explicitly authorized after local review, including
+confirmed-cleaning cancellation. See REVIEW-2.1.2.md and CHECKLIST-2.1.2.md
+for the earlier review record. Future 2.2.0 features are not included.
+
+## Previous production notes
 
 Version 2.1.1 adds change history with safe undo and fixes immediate visibility
 of checkout cleaning suggestions, with priorities first. Publication approved

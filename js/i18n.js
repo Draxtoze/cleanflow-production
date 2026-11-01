@@ -8,6 +8,8 @@ import { operationsEnglish, operationsPolish } from './operations-i18n.js';
 import { updatesEnglish, updatesPolish } from './updates-i18n.js';
 import {v2English,v2Polish} from './v2-i18n.js';
 import {historyEnglish,historyPolish} from './history-i18n.js';
+import {planningEnglish,planningPolish} from './planning-i18n.js';
+Object.assign(en,planningEnglish);Object.assign(pl,planningPolish);
 Object.assign(en,historyEnglish);Object.assign(pl,historyPolish);
 import {legacyEnglish,legacyPolish} from './legacy-i18n.js';
 Object.assign(en,legacyEnglish);
