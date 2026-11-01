@@ -67,7 +67,11 @@ export async function createEmployeePeriodPdf({data,staffId,start,end,includeMon
   writer.title(tr('ops.employeeReport'));writer.subtitle(report.staff.name);writer.subtitle(`${labels.period}: ${formatDmy(start)} — ${formatDmy(end)}`);writer.note(labels.statusCopy[status]);
   writer.keyValues([[labels.planned,report.planned],[labels.confirmed,report.confirmed]]);
   if(!report.rows.length)writer.note(tr('ops.noWork'));
-  else writer.table([labels.date,labels.apartmentCategory,labels.statusLabel,labels.notes],report.rows.map(row=>[formatDmy(row.date),`${row.name}\n${row.categoryName}`,`${row.status==='confirmed'?labels.confirmed:labels.planned}${row.checkout?' · '+tr('ops.checkout'):''}${row.dogBonus?' · '+tr('ops.dog'):''}`,row.notes||'—']),[28,64,46,44]);
+  else {
+    const headers=[labels.date,labels.apartmentCategory,labels.statusLabel,...(includeMoney?[tr('ops.reportExpected'),tr('ops.reportEarned')]:[]),labels.notes];
+    const rows=report.rows.map(row=>[formatDmy(row.date),`${row.name}\n${row.categoryName}`,`${row.status==='confirmed'?labels.confirmed:labels.planned}${row.checkout?' · '+tr('ops.checkout'):''}${row.dogBonus?' · '+tr('ops.dog'):''}`,...(includeMoney?[row.status==='planned'?pdfMoney(cleaningAmount(row),language):'—',row.status==='confirmed'?pdfMoney(cleaningAmount(row),language):'—']:[]),row.notes||'—']);
+    writer.table(headers,rows,includeMoney?[23,47,34,24,24,30]:[28,64,46,44]);
+  }
   if(includeMoney)writer.keyValues([[labels.expected,pdfMoney(report.rows.filter(row=>row.status==='planned').reduce((sum,row)=>sum+cleaningAmount(row),0),language)],[labels.real,pdfMoney(report.rows.filter(row=>row.status==='confirmed').reduce((sum,row)=>sum+cleaningAmount(row),0),language)]]);
   writer.section(tr('ops.signature'));writer.subtitle('________________________________________');
   return {blob:writer.finish(generated(language)).output('blob'),fileName:`${safeFilePart(report.staff.name)} ${start} — ${end}.pdf`,report,status};

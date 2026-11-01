@@ -1,4 +1,12 @@
-# CleanFlow 2.1.2
+# CleanFlow 2.2.0
+
+Version 2.2.0 adds only per-apartment planned/earned amounts to the employee PDF
+when financial details are enabled, including saved dog bonuses. It retains the
+released 2.1.2 planning and cancellation fixes. No guest messaging, SMS, WhatsApp,
+photo galleries or media storage changes are included. Database schema stays 4.
+See RELEASE-NOTES-2.2.0.md.
+
+## Previous production release
 
 Version 2.1.2 improves planning, checkout suggestions, selection ordering and
 safe cancellation of planned or confirmed cleanings. Confirmed cancellation

@@ -1,4 +1,5 @@
 export const operationsEnglish = {
+ 'ops.reportExpected':'Planned (PLN)','ops.reportEarned':'Earned (PLN)',
  'ops.autoSaved':'Saved automatically','ops.dueLabel':'due',
  'ops.weekOf':'Week of',
  'ops.selectApartment':'Select at least one apartment.','ops.keepConfirmed':'Keep at least one apartment when correcting this completed cleaning.','ops.invalidMoney':'Enter a valid PLN amount with no more than two decimal places.','ops.saveError':'Could not save this change.','ops.importError':'Could not read this backup.','ops.confirmError':'Could not confirm this cleaning.',
@@ -12,6 +13,7 @@ export const operationsEnglish = {
 };
 Object.assign(operationsEnglish, {'ops.correctConfirmed':'Correct confirmed cleaning','ops.confirmedUpdated':'Confirmed cleaning updated; balance recalculated.','ops.ownerCharge':'Owner cleaning charge (PLN, optional)','ops.ownerChargeHelp':'Separate from employee pay. Leave zero to omit charges from owner reports.','ops.notesHelp':'Cleaning instructions / notes','ops.demo':'Development demo — separate sample data'});
 export const operationsPolish = {
+ 'ops.reportExpected':'Plan (PLN)','ops.reportEarned':'Zarobiono (PLN)',
  'ops.autoSaved':'Zapisano automatycznie','ops.dueLabel':'do wypłaty',
  'ops.weekOf':'Tydzień od',
  'ops.selectApartment':'Wybierz co najmniej jeden apartament.','ops.keepConfirmed':'Pozostaw co najmniej jeden apartament podczas poprawiania wykonanego sprzątania.','ops.invalidMoney':'Podaj prawidłową kwotę w PLN z maksymalnie dwoma miejscami po przecinku.','ops.saveError':'Nie udało się zapisać zmiany.','ops.importError':'Nie udało się odczytać kopii zapasowej.','ops.confirmError':'Nie udało się potwierdzić sprzątania.',

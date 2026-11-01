@@ -1,6 +1,6 @@
-# CleanFlow 2.1.2 — macOS guidance
+# CleanFlow 2.2.0 — macOS guidance
 
-Shared application source is version 2.1.2, schema 4. The new cleaning workflows
+Shared application source is version 2.2.0, schema 4. The new cleaning workflows
 were validated on Windows; a macOS runtime build was not tested here.
 
 ## Previous guidance
