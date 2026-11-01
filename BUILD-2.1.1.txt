@@ -1,0 +1,9 @@
+CleanFlow 2.1.1 production release - approved 1 November 2026.
+Windows installer: CleanFlow-Setup-2.1.1.exe
+SHA256: 459cf67755adbed45ac1295a5141b932492c9ccc4754717a166fd54b6f78b872
+Size: 127639995 bytes.
+Companion blockmap and latest.yml generated; manifest SHA512 and size verified.
+50 unit/filesystem tests passed. Priority suggestions tested EN/PL.
+History browser/native undo and backup tests passed. Full A/B restore and four PDF types EN/PL passed.
+Production package tested in an isolated blank profile; source equality and demo/database/backup exclusions verified.
+Unsigned installer. No installed user application replaced during publication.

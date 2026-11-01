@@ -1,6 +1,7 @@
 import { validateReservationRecord } from './reservations.js';
 import { cleaningAmount, validateOperations } from './operations.js';
 import {validatePreferences} from './preferences.js';
+import {validateHistory} from './history.js';
 
 export const BACKUP_VERSION = 4;
 export const toGrosz = value => {
@@ -40,6 +41,7 @@ export function validateBackup(data) {
   for (const state of data.data.checkoutStates || []) if (!state.id || !state.apartmentId || !/^\d{4}-\d{2}-\d{2}$/.test(state.date) || !['ignored'].includes(state.status)) throw new Error('The backup contains an invalid checkout state.');
   validateOperations(data.data);
   const preferences=data.data.settings.find(item=>item.id==='preferences');if(preferences)validatePreferences(preferences);
+  validateHistory(data.data);
   return true;
 }
 

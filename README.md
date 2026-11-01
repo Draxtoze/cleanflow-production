@@ -1,9 +1,14 @@
-# CleanFlow 2.0.1
+# CleanFlow 2.1.1
+
+Version 2.1.1 adds change history with safe undo and fixes immediate visibility
+of checkout cleaning suggestions, with priorities first. Publication approved
+after demo review. See RELEASE-NOTES-2.1.1.md and HISTORY-REVIEW.md.
 
 Production release approved after local demo review. See RELEASE-NOTES-2.0.0.md
 for appearance, report configuration, views and automatic backup improvements.
 Production starts blank. No user database, automatic backup or demo module is included.
-The separate dummy 2.0.1 update experiment has not been authorized or performed.
+Version 2.0.1 was a version-only update test. Download/approval from installed
+1.5.1 was observed; a completed user-driven upgrade was not independently certified.
 
 Windows versions 1.5.1 and later check the public GitHub release feed at every startup and download newer stable versions in the background. Installation requires explicit approval and restarts the app. Later/closing never installs automatically. Offline use is unaffected. Install the current Windows release manually if your older installation does not support updates. See RELEASE-NOTES-1.5.1.md.
 

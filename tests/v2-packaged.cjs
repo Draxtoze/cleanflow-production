@@ -2,11 +2,11 @@ const {_electron}=require(process.env.CLEANFLOW_PLAYWRIGHT||'playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os');
 (async()=>{
  const root=path.resolve(__dirname,'..'),profile=await fs.mkdtemp(path.join(os.tmpdir(),'cf-v2-package-'));
- const launch=()=>_electron.launch({executablePath:path.join(root,'dist','win-unpacked','CleanFlow.exe'),args:[`--user-data-dir=${profile}`]});
+ const launch=()=>_electron.launch({executablePath:process.env.CLEANFLOW_PACKAGED_EXE||path.join(root,'dist','win-unpacked','CleanFlow.exe'),args:[`--user-data-dir=${profile}`]});
  let app=await launch();let initial;
  try{
   let page=await app.firstWindow();await page.locator('nav').waitFor();await page.waitForFunction(async()=>{const r=await window.cleanflowDesktop.backupStatus();return r.ok&&r.value.createdToday;});
-  const info=(await page.evaluate(()=>window.cleanflowDesktop.info())).value;assert.equal(info.version,'2.0.1');assert.equal(info.schema,4);assert.equal(info.demo,false);assert.equal(info.backups,true);assert.equal(info.updates,true);
+  const info=(await page.evaluate(()=>window.cleanflowDesktop.info())).value;assert.equal(info.version,'2.1.1');assert.equal(info.schema,4);assert.equal(info.demo,false);assert.equal(info.backups,true);assert.equal(info.updates,true);
   await page.locator('nav [data-page=staff]').click();assert.equal(await page.locator('[data-staff-card]').count(),0);assert.equal(await page.evaluate(()=>typeof window.require),'undefined');assert.equal(await page.evaluate(()=>location.origin),'cleanflow://app');
   const files=await fs.readdir(path.join(profile,'automatic-backups'));assert.equal(files.length,1);initial=await fs.readFile(path.join(profile,'automatic-backups',files[0]),'utf8');assert.equal(JSON.parse(initial).backup.data.staff.length,0);
   assert.equal((await page.evaluate(()=>window.cleanflowDesktop.seedDemoBackups({}))).ok,false);
